@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using IHolographyH1.Scaners;
+using System.Threading;
+using System.IO;
 
 namespace IHolographyH1
 {
@@ -22,12 +24,37 @@ namespace IHolographyH1
     /// </summary>
     public partial class MainWindow : Window
     {
+        List<DataScan> dataScans = new List<DataScan>();
         public MainWindow()
         {
             InitializeComponent();
+
+            COM.OpenConnection();
+
+            
             Scanners scanners = new Scanners();
+            scanners.GetConnectedScanners(out string outXml);
+            scanners.RegisterForEvent();
+            scanners.ScanAction += GetScanAndPutInList;
+
 
         }
 
+        public void GetScanAndPutInList(DataScan dataScan)
+        {
+            dataScans.Add(dataScan);
+        }
+        public void ShowDataScans()
+        {
+            foreach(DataScan dataScan in dataScans)
+            {
+                MessageBox.Show(dataScan.Barcode);
+            }
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            ShowDataScans();
+        }
     }
 }

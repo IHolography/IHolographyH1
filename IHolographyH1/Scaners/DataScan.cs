@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AppDefs;
 
 namespace IHolographyH1.Scaners
 {
@@ -18,7 +19,7 @@ namespace IHolographyH1.Scaners
                 Barcode = barcode;
                 ScannerSN = scannerSN;
                 Symbology = symbology;
-                CreateDateTime = DateTime.Now.ToString(formatDateTime);
+            CreateDateTime = Variable.GetStringDateTime();//DateTime.Now.ToString(formatDateTime);
             }
             public override string ToString()
             {

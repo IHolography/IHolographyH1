@@ -7,41 +7,17 @@ namespace IHolographyH1.Scaners
 {
     class Scanners
     {
+        // Scan event
+        public delegate void Scan(DataScan dataScan);
+        public event Scan ScanAction;
+        // Other diagnostic event
+        #region DiagnosticEvents
         public delegate void ScannersHandler(string message);
         public event ScannersHandler Log_Notify;
         public event ScannersHandler CommandExecuteResult_Notify;
-        public CCoreScanner CoreScannerObject { get; private set; }
+        #endregion
         public Scanners()
         {
-            CoreScannerObject = new CCoreScanner();
-        }
-        public int OpenCom()
-        {
-            // Initialize CoreScanner COM object
-            int appHandle = 0;
-            const short NumberOfScannerTypes = 1;
-            short[] scannerTypes = new short[NumberOfScannerTypes];
-            scannerTypes[0] = (short)ScannerType.All; //  All scanner types
-            int status = -1;
-
-            try
-            {
-                // Open CoreScanner COM Object
-                CoreScannerObject.Open(appHandle,            // Application handle     
-                                       scannerTypes,         // Array of scanner types    
-                                       NumberOfScannerTypes, // Length of scanner types array 
-                                       out status);          // Command execution success/failure return status 
-
-                if (status == (int)Status.Success)
-                {
-                    Log_Notify?.Invoke(DateTime.Now + "   Scanners Open() - Success.");
-                }
-            }
-            catch
-            {
-                Log_Notify?.Invoke(DateTime.Now + "   Can't open COM object. Scanners Open() - Failed");
-            }
-            return status;
         }
         public int GetConnectedScanners(out string outXml)
         {
@@ -50,10 +26,10 @@ namespace IHolographyH1.Scaners
             int[] scannerIdList = new int[Constant.MaxNumDevices];
             int status = -1;
 
-            if (OpenCom() != -1)
+            if (COM.Status != -1)
             {
                 // Get connected scanners
-                CoreScannerObject.GetScanners(out numOfScanners, // Returns number of scanners discovered 
+                COM.CoreScannerObject.GetScanners(out numOfScanners, // Returns number of scanners discovered 
                                               scannerIdList,     // Returns array of connected scanner ids 
                                               out xml,        // Output xml containing discovered scanners information 
                                               out status);       // Command execution success/failure return status 
@@ -66,31 +42,10 @@ namespace IHolographyH1.Scaners
             }
             return status;
         }
-        public int CloseCom()
-        {
-            int appHandle = 0;
-            int status = -1;
-
-            // Close CoreScanner COM Object
-            CoreScannerObject.Close(appHandle,   // Application handle
-                                    out status); // Command execution success/failure return status 
-
-            if (status == (int)Status.Success)
-            {
-                Log_Notify?.Invoke(DateTime.Now + "   Scanners Close() - Success.");
-            }
-            else
-            {
-                Log_Notify?.Invoke(DateTime.Now + "   Scanners Close() - Failed. Error Code : " + status);
-            }
-
-            return status;
-
-        }
         public int RegisterForEvent()
         {
             // Subscribe for barcode events in cCoreScannerClass
-            CoreScannerObject.BarcodeEvent += new
+            COM.CoreScannerObject.BarcodeEvent += new
             _ICoreScannerEvents_BarcodeEventEventHandler(OnBarcodeEvent);
 
             int eventIdCount = 1; // Number of events to register (only barcode events)
@@ -111,7 +66,7 @@ namespace IHolographyH1.Scaners
             int status = -1;
 
             // Call register for events
-            CoreScannerObject.ExecCommand(opCode,      // Opcode: Register for events
+            COM.CoreScannerObject.ExecCommand(opCode,      // Opcode: Register for events
                                           ref inXml,   // Input XML
                                           out outXml,  // Output XML 
                                           out status); // Command execution success/failure return status  
@@ -158,6 +113,7 @@ namespace IHolographyH1.Scaners
                                                                                "; symbology= " + symbologyData +
                                                                                "; scanner S/N: " + scannerSerialNumber);
                 #endregion
+                GetDataScan(strData, scannerSerialNumber, symbologyData);
             }
             catch (Exception ex)
             {
@@ -398,16 +354,11 @@ namespace IHolographyH1.Scaners
         {
             GetDecodeBarcode(pscanData);
         }
-        private DataScan GetDataScan(string barcode, string scannerSN, string symbology)
+        private void GetDataScan(string barcode, string scannerSN, string symbology)
         {
             DataScan scan = new DataScan(barcode, scannerSN, symbology);
-
-            #region Notify(string str)
-            CommandExecuteResult_Notify?.Invoke("Scan obgect:   " + scan.ToString());
-            Log_Notify?.Invoke(DateTime.Now + "   Scanners GetDataScan() - Success.");
-            #endregion
-
-            return scan;
+            Logger.Write(scan.ToString(),this);
+            ScanAction?.Invoke(scan);
         }
     }
 }
