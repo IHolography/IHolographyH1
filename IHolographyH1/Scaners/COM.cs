@@ -1,5 +1,4 @@
 ﻿using CoreScanner;
-using CoreScannerLib;
 using AppDefs;
 using System;
 using System.Collections.Generic;
@@ -49,7 +48,7 @@ namespace IHolographyH1.Scaners
             CoreScannerObject.Close(appHandle,   // Application handle
                                     out status); // Command execution success/failure return status 
 
-            if (status == (int)CoreScannerLib.Status.Success)
+            if (status == (int)AppDefs.Status.Success)
             {
                 Logger.Write("Com connection for scanner is closed");
             }

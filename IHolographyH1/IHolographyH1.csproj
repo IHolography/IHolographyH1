@@ -58,7 +58,6 @@
     </ApplicationDefinition>
     <Compile Include="AppDefs.cs" />
     <Compile Include="Logger\Logger.cs" />
-    <Compile Include="Scaners\CommonDefs.cs" />
     <Compile Include="Scaners\DataScan.cs" />
     <Compile Include="Scaners\COM.cs" />
     <Compile Include="Scaners\Scanners.cs" />
