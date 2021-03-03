@@ -31,10 +31,11 @@ namespace IHolographyH1.Scaners
                                        scannerTypes,         // Array of scanner types    
                                        NumberOfScannerTypes, // Length of scanner types array 
                                        out status);          // Command execution success/failure return status 
+                Logger.Write("Com connection for scanner is open");
             }
             catch
             {
-                Logger.Write("Com connection for scanner is open");
+                Logger.Write("Com connection for scanner failed");
             }
             Status =  status;
         }

@@ -84,15 +84,16 @@ namespace IHolographyH1.Scaners
         }
         private void GetDecodeBarcode(string strXml)
         {
-            System.Diagnostics.Debug.WriteLine("Initial XML" + strXml);
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(strXml);
 
             string strData = String.Empty;
             string symbologyData = String.Empty;
             string scannerSerialNumber = String.Empty;
+            string scanerID = string.Empty;
             try
             {
+                scanerID=xmlDoc.DocumentElement.SelectNodes("scannerID")[0].InnerText;
                 string barcode = xmlDoc.DocumentElement.GetElementsByTagName("datalabel").Item(0).InnerText;
                 string symbology = xmlDoc.DocumentElement.GetElementsByTagName("datatype").Item(0).InnerText;
                 scannerSerialNumber = xmlDoc.DocumentElement.GetElementsByTagName("serialnumber").Item(0).InnerText;
@@ -114,7 +115,7 @@ namespace IHolographyH1.Scaners
                 //                                                               "; symbology= " + symbologyData +
                 //                                                               "; scanner S/N: " + scannerSerialNumber);
                 #endregion
-                GetDataScan(strData, scannerSerialNumber, symbologyData);
+                GetDataScan(strData, scannerSerialNumber, symbologyData, scanerID);
             }
             catch
             {
@@ -351,9 +352,9 @@ namespace IHolographyH1.Scaners
         {
             GetDecodeBarcode(pscanData);
         }
-        private void GetDataScan(string barcode, string scannerSN, string symbology)
+        private void GetDataScan(string barcode, string scannerSN, string symbology, string scannerID)
         {
-            DataScan scan = new DataScan(barcode, scannerSN, symbology);
+            DataScan scan = new DataScan(barcode, scannerSN, symbology, scannerID);
             Logger.Write(scan.ToString(),this);
             ScanAction?.Invoke(scan);
         }
