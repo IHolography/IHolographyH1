@@ -9,6 +9,18 @@ using System.Threading.Tasks;
 namespace AppDefs
 {
     #region Enum
+    public enum Alm
+    {
+        Undefined = 0,
+        Alarm = 1,
+        Ok = 2
+    }
+    public enum ScannerAction
+    {
+        Undefined=0,
+        BoxScan = 1,
+        ProductScan = 2
+    }
     public enum ScannerType
     {
         /// <summary>

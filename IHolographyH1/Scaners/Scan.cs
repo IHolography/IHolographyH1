@@ -2,51 +2,41 @@
 using CoreScanner;
 using System.Xml;
 using AppDefs;
+using System.Collections.Generic;
 
 namespace IHolographyH1.Scaners
 {
-    class Scanners
+    class Scan
     {
         // Scan event
-        public delegate void Scan(DataScan dataScan);
-        public event Scan ScanAction;
+        public delegate void Scanner(DataScan dataScan);
+        public event Scanner ScanEvent;
         // Other diagnostic event
         #region DiagnosticEvents
         //public delegate void ScannersHandler(string message);
         //public event ScannersHandler Log_Notify;
         //public event ScannersHandler CommandExecuteResult_Notify;
         #endregion
-        public Scanners()
+
+        public static CCoreScanner CoreScannerObject { get; private set; }
+        public DataScan ScanEventInfo { get; private set; }
+        public static ScannerAction ScannerAction { get; set; }
+
+        private static List<string> ListIdScannersWithException { get; set; }
+        //private static Alm AlmState { get; set; }
+
+        public Scan(CCoreScanner coreScannerObject)
         {
+            //AlmState = AppDefs.Alm.Ok;
+            ListIdScannersWithException = new List<string>();
+            CoreScannerObject = coreScannerObject;
+            RegisterForEvent();
             Logger.Write("Object created",this);
         }
-        public int GetConnectedScanners(out string outXml)
-        {
-            short numOfScanners = 0;
-            string xml = outXml = "";
-            int[] scannerIdList = new int[Constant.MaxNumDevices];
-            int status = (int)AppDefs.Status.Failed;
-
-            if (COM.Status != (int)AppDefs.Status.Failed)
-            {
-                // Get connected scanners
-                COM.CoreScannerObject.GetScanners(out numOfScanners, // Returns number of scanners discovered 
-                                              scannerIdList,     // Returns array of connected scanner ids 
-                                              out xml,        // Output xml containing discovered scanners information 
-                                              out status);       // Command execution success/failure return status 
-
-                if (status == (int)AppDefs.Status.Success)
-                {
-                    outXml = xml;
-                    //CommandExecuteResult_Notify?.Invoke("Scanners GetConnectedScanners() - Success. Out xml : " + Environment.NewLine + xml);
-                }
-            }
-            return status;
-        }
-        public int RegisterForEvent()
+        private int RegisterForEvent()
         {
             // Subscribe for barcode events in cCoreScannerClass
-            COM.CoreScannerObject.BarcodeEvent += new
+            CoreScannerObject.BarcodeEvent += new
             _ICoreScannerEvents_BarcodeEventEventHandler(OnBarcodeEvent);
 
             int eventIdCount = 1; // Number of events to register (only barcode events)
@@ -350,13 +340,112 @@ namespace IHolographyH1.Scaners
         }
         private void OnBarcodeEvent(short eventType, ref string pscanData)
         {
-            GetDecodeBarcode(pscanData);
+            //if (AlmState == AppDefs.Alm.Ok)
+            //{
+                GetDecodeBarcode(pscanData);
+            //}
         }
         private void GetDataScan(string barcode, string scannerSN, string symbology, string scannerID)
         {
-            DataScan scan = new DataScan(barcode, scannerSN, symbology, scannerID);
-            Logger.Write(scan.ToString(),this);
-            ScanAction?.Invoke(scan);
+            if (ScannerAction == ScannerAction.Undefined)
+            {
+                Logger.Write("Scanner action undefined. ScanData not available on this scan.", this);
+                Exception(scannerID);
+                //throw new Exception();
+            }
+            else
+            {
+                ResetAlm();
+                ScanEventInfo = new DataScan(barcode, scannerSN, symbology, scannerID, ScannerAction);
+                Logger.Write(ScanEventInfo.ToString(), this);
+                ScanEvent?.Invoke(ScanEventInfo);
+            }
+        }
+        private void Exception(string scannerID)
+        {
+            //AlmState = AppDefs.Alm.Alarm;
+            Alm(scannerID);
+            ListIdScannersWithException.Add(scannerID);
+        }
+        public static void ResetAlm()
+        {
+            if (ListIdScannersWithException != null && ListIdScannersWithException.Count!=0)
+            {
+                foreach (string i in ListIdScannersWithException)
+                {
+                    OffRedLed(i);
+                }
+                ListIdScannersWithException.Clear();
+            }
+            else
+            {
+                OffRedLed("1");
+                OffRedLed("2");
+            }
+            //AlmState = AppDefs.Alm.Ok;
+        }
+        private void Alm(string scannerID)
+        {
+            OnRedLed(scannerID);
+            OnSpecificBeep(scannerID);
+        }
+        private void OnRedLed(string scannerID)
+        {
+            int status = (int)Status.Failed;
+            string outXml = String.Empty;
+            int opCode = (int)Opcode.SetAction;
+            // Trigger scanner LED3 (Red) off - input xml
+            string inXml = "<inArgs>" +
+                    "<scannerID>" + scannerID.ToString() + "</scannerID>" +
+                    "<cmdArgs>" +
+                    "<arg-int>" + (int)LEDCode.Led3On +  // Specify LED code to switch on/off
+                    "</arg-int>" +
+                    "</cmdArgs>" +
+                    "</inArgs>";
+
+            // Trigger scanner LED off 
+            CoreScannerObject.ExecCommand(opCode, // Opcode: for Scanner LED on (SET_ACTION)
+                ref inXml, // Input XML
+                out outXml, // Output XML 
+                out status); // Command execution success/failure return status
+        }
+        private static void OffRedLed(string scannerID)
+        {
+            int status = (int)Status.Failed;
+            string outXml = String.Empty;
+            int opCode = (int)Opcode.SetAction;
+            // Trigger scanner LED3 (Red) off - input xml
+            string inXml = "<inArgs>" +
+                    "<scannerID>" + scannerID.ToString() + "</scannerID>" +
+                    "<cmdArgs>" +
+                    "<arg-int>" + (int)LEDCode.Led3Off +  // Specify LED code to switch on/off
+                    "</arg-int>" +
+                    "</cmdArgs>" +
+                    "</inArgs>";
+
+            // Trigger scanner LED off 
+            CoreScannerObject.ExecCommand(opCode, // Opcode: for Scanner LED on (SET_ACTION)
+                ref inXml, // Input XML
+                out outXml, // Output XML 
+                out status); // Command execution success/failure return status
+        }
+        private void OnSpecificBeep(string scannerID)
+        {
+            int status = (int)Status.Failed;
+            string outXml = String.Empty;
+            int opCode = (int)Opcode.SetAction;
+            string inXml = "<inArgs>" +
+                                          "<scannerID>" + scannerID.ToString() + "</scannerID>" +
+                                          "<cmdArgs>" +
+                                          "<arg-int>" + (int)BeepCode.ThreeLongLow +  // Specify beeper code
+                                          "</arg-int>" +
+                                          "</cmdArgs>" +
+                                          "</inArgs>";
+
+            CoreScannerObject.ExecCommand(opCode, // Opcode: for Scanner LED on (SET_ACTION)
+               ref inXml, // Input XML
+               out outXml, // Output XML 
+               out status); // Command execution success/failure return status
         }
     }
 }
