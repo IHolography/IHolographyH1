@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IHolographyH1.Scaners
+namespace IHolographyH1
 {
     public static class COM
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AppDefs;
 
-namespace IHolographyH1.Scaners
+namespace IHolographyH1
 {
         public class DataScan
         {

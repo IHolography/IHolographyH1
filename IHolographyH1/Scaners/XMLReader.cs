@@ -1,92 +1,36 @@
-﻿using System;
-using CoreScanner;
-using System.Xml;
-using AppDefs;
+﻿using AppDefs;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
 
-namespace IHolographyH1.Scaners
+namespace IHolographyH1
 {
-    class Scan
+    public static class XMLReader
     {
-        // Scan event
-        public delegate void Scanner(DataScan dataScan);
-        public event Scanner ScanEvent;
-        // Other diagnostic event
-        #region DiagnosticEvents
-        //public delegate void ScannersHandler(string message);
-        //public event ScannersHandler Log_Notify;
-        //public event ScannersHandler CommandExecuteResult_Notify;
-        #endregion
+        public static string Barcode { get; private set; }
+        public static string Symbology { get; private set; }
+        public static string ScannerSerialNumber { get; private set; }
+        public static string ScanerID { get; private set; }
 
-        public static CCoreScanner CoreScannerObject { get; private set; }
-        public DataScan ScanEventInfo { get; private set; }
-        public static ScannerAction ScannerAction { get; set; }
-
-        private static List<string> ListIdScannersWithException { get; set; }
-        //private static Alm AlmState { get; set; }
-
-        public Scan(CCoreScanner coreScannerObject)
+        static XMLReader()
         {
-            //AlmState = AppDefs.Alm.Ok;
-            ListIdScannersWithException = new List<string>();
-            CoreScannerObject = coreScannerObject;
-            RegisterForEvent();
-            Logger.Write("Object created",this);
         }
-        private int RegisterForEvent()
-        {
-            // Subscribe for barcode events in cCoreScannerClass
-            CoreScannerObject.BarcodeEvent += new
-            _ICoreScannerEvents_BarcodeEventEventHandler(OnBarcodeEvent);
 
-            int eventIdCount = 1; // Number of events to register (only barcode events)
-            int[] eventIdList = new int[eventIdCount];
-            // Register for barcode events only
-            eventIdList[0] = (int)EventType.Barcode;
-
-            string eventIds = String.Join(",", eventIdList);
-            string inXml = "<inArgs>" +
-                           "<cmdArgs>" +
-                           "<arg-int>" + eventIdCount + "</arg-int>" +   // Number of events to register
-                           "<arg-int>" + eventIds + "</arg-int>" +       // Event id list of events to register for
-                           "</cmdArgs>" +
-                           "</inArgs>";
-
-            int opCode = (int)Opcode.RegisterForEvents;
-            string outXml = "";
-            int status = (int)AppDefs.Status.Failed;
-
-            // Call register for events
-            COM.CoreScannerObject.ExecCommand(opCode,  // Opcode: Register for events
-                                          ref inXml,   // Input XML
-                                          out outXml,  // Output XML 
-                                          out status); // Command execution success/failure return status  
-
-            if (status == (int)AppDefs.Status.Success)
-            {
-                //Log_Notify?.Invoke(DateTime.Now + "   Scanners RegisterForEvents() - Success.");
-            }
-            else
-            {
-                //Log_Notify?.Invoke(DateTime.Now + "   Scanners RegisterForEvents() - Failed. Error Code : " + status);
-            }
-            return status;
-        }
-        private void GetDecodeBarcode(string strXml)
+        public static void ParseXML(string xml)
         {
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(strXml);
+            xmlDoc.LoadXml(xml);
 
             string strData = String.Empty;
-            string symbologyData = String.Empty;
-            string scannerSerialNumber = String.Empty;
-            string scanerID = string.Empty;
             try
             {
-                scanerID=xmlDoc.DocumentElement.SelectNodes("scannerID")[0].InnerText;
+                string scanerID = xmlDoc.DocumentElement.SelectNodes("scannerID")[0].InnerText;
                 string barcode = xmlDoc.DocumentElement.GetElementsByTagName("datalabel").Item(0).InnerText;
                 string symbology = xmlDoc.DocumentElement.GetElementsByTagName("datatype").Item(0).InnerText;
-                scannerSerialNumber = xmlDoc.DocumentElement.GetElementsByTagName("serialnumber").Item(0).InnerText;
+                string scannerSerialNumber = xmlDoc.DocumentElement.GetElementsByTagName("serialnumber").Item(0).InnerText;
                 string[] numbers = barcode.Split(' ');
 
                 foreach (string number in numbers)
@@ -97,22 +41,20 @@ namespace IHolographyH1.Scaners
                     }
                     strData += ((char)Convert.ToInt32(number, 16)).ToString();
                 }
-                symbologyData = GetSymbology((int)Convert.ToInt32(symbology));
-
-                #region Notify(string str)
-                //Log_Notify?.Invoke(DateTime.Now + "   Scanners GetDecodeBarcode() - Success.");
-                //CommandExecuteResult_Notify?.Invoke("   Scanners OnBarcodeEvent(): decodeBarcode= " + strData +
-                //                                                               "; symbology= " + symbologyData +
-                //                                                               "; scanner S/N: " + scannerSerialNumber);
-                #endregion
-                GetDataScan(strData, scannerSerialNumber, symbologyData, scanerID);
+                Symbology = GetSymbology((int)Convert.ToInt32(symbology));
+                Barcode = strData;
+                ScannerSerialNumber = scannerSerialNumber;
+                ScanerID = scanerID;
             }
             catch
             {
-                //Log_Notify?.Invoke(DateTime.Now + "   Scanners GetDecodeBarcode() - Failed. " + ex.Message);
+                Barcode = String.Empty;
+                Symbology = String.Empty;
+                ScannerSerialNumber = String.Empty;
+                ScanerID = String.Empty;
             }
         }
-        private string GetSymbology(int Code)
+        private static string GetSymbology(int Code)
         {
             switch (Code)
             {
@@ -337,115 +279,6 @@ namespace IHolographyH1.Scaners
                 default:
                     return "";
             }
-        }
-        private void OnBarcodeEvent(short eventType, ref string pscanData)
-        {
-            //if (AlmState == AppDefs.Alm.Ok)
-            //{
-                GetDecodeBarcode(pscanData);
-            //}
-        }
-        private void GetDataScan(string barcode, string scannerSN, string symbology, string scannerID)
-        {
-            if (ScannerAction == ScannerAction.Undefined)
-            {
-                Logger.Write("Scanner action undefined. ScanData not available on this scan.", this);
-                Exception(scannerID);
-                //throw new Exception();
-            }
-            else
-            {
-                ResetAlm();
-                ScanEventInfo = new DataScan(barcode, scannerSN, symbology, scannerID, ScannerAction);
-                Logger.Write(ScanEventInfo.ToString(), this);
-                ScanEvent?.Invoke(ScanEventInfo);
-            }
-        }
-        private void Exception(string scannerID)
-        {
-            //AlmState = AppDefs.Alm.Alarm;
-            Alm(scannerID);
-            ListIdScannersWithException.Add(scannerID);
-        }
-        public static void ResetAlm()
-        {
-            if (ListIdScannersWithException != null && ListIdScannersWithException.Count!=0)
-            {
-                foreach (string i in ListIdScannersWithException)
-                {
-                    OffRedLed(i);
-                }
-                ListIdScannersWithException.Clear();
-            }
-            else
-            {
-                OffRedLed("1");
-                OffRedLed("2");
-            }
-            //AlmState = AppDefs.Alm.Ok;
-        }
-        private void Alm(string scannerID)
-        {
-            OnRedLed(scannerID);
-            OnSpecificBeep(scannerID);
-        }
-        private void OnRedLed(string scannerID)
-        {
-            int status = (int)Status.Failed;
-            string outXml = String.Empty;
-            int opCode = (int)Opcode.SetAction;
-            // Trigger scanner LED3 (Red) off - input xml
-            string inXml = "<inArgs>" +
-                    "<scannerID>" + scannerID.ToString() + "</scannerID>" +
-                    "<cmdArgs>" +
-                    "<arg-int>" + (int)LEDCode.Led3On +  // Specify LED code to switch on/off
-                    "</arg-int>" +
-                    "</cmdArgs>" +
-                    "</inArgs>";
-
-            // Trigger scanner LED off 
-            CoreScannerObject.ExecCommand(opCode, // Opcode: for Scanner LED on (SET_ACTION)
-                ref inXml, // Input XML
-                out outXml, // Output XML 
-                out status); // Command execution success/failure return status
-        }
-        private static void OffRedLed(string scannerID)
-        {
-            int status = (int)Status.Failed;
-            string outXml = String.Empty;
-            int opCode = (int)Opcode.SetAction;
-            // Trigger scanner LED3 (Red) off - input xml
-            string inXml = "<inArgs>" +
-                    "<scannerID>" + scannerID.ToString() + "</scannerID>" +
-                    "<cmdArgs>" +
-                    "<arg-int>" + (int)LEDCode.Led3Off +  // Specify LED code to switch on/off
-                    "</arg-int>" +
-                    "</cmdArgs>" +
-                    "</inArgs>";
-
-            // Trigger scanner LED off 
-            CoreScannerObject.ExecCommand(opCode, // Opcode: for Scanner LED on (SET_ACTION)
-                ref inXml, // Input XML
-                out outXml, // Output XML 
-                out status); // Command execution success/failure return status
-        }
-        private void OnSpecificBeep(string scannerID)
-        {
-            int status = (int)Status.Failed;
-            string outXml = String.Empty;
-            int opCode = (int)Opcode.SetAction;
-            string inXml = "<inArgs>" +
-                                          "<scannerID>" + scannerID.ToString() + "</scannerID>" +
-                                          "<cmdArgs>" +
-                                          "<arg-int>" + (int)BeepCode.ThreeLongLow +  // Specify beeper code
-                                          "</arg-int>" +
-                                          "</cmdArgs>" +
-                                          "</inArgs>";
-
-            CoreScannerObject.ExecCommand(opCode, // Opcode: for Scanner LED on (SET_ACTION)
-               ref inXml, // Input XML
-               out outXml, // Output XML 
-               out status); // Command execution success/failure return status
         }
     }
 }

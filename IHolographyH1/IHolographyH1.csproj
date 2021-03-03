@@ -61,7 +61,8 @@
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Scaners\DataScan.cs" />
     <Compile Include="Scaners\COM.cs" />
-    <Compile Include="Scaners\Scan.cs" />
+    <Compile Include="Scaners\ScanListener.cs" />
+    <Compile Include="Scaners\XMLReader.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
