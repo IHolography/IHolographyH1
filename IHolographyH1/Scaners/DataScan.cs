@@ -13,18 +13,20 @@ namespace IHolographyH1.Scaners
             public string ScannerSN { get; set; }
             public string Symbology { get; set; }
             public string ScannerID { get; set; }
-            public string CreateDateTime { get; private set; }
-            public DataScan(string barcode, string scannerSN, string symbology, string scannerID)
+            public ScannerAction ScannerAction { get; set; }
+        public string CreateDateTime { get; private set; }
+            public DataScan(string barcode, string scannerSN, string symbology, string scannerID, ScannerAction scannerAction)
             {
                 Barcode = barcode;
                 ScannerSN = scannerSN;
                 Symbology = symbology;
                 ScannerID = scannerID;
+                ScannerAction = scannerAction;
                 CreateDateTime = Variable.GetStringDateTime();
             }
             public override string ToString()
             {
-                return $"Data scan: barcode - {Barcode}, ScannerID - {ScannerID}, ScannerSN - {ScannerSN}, Symbology - {Symbology}, Date - {CreateDateTime}";
+                return $"Data scan: action - {ScannerAction}, barcode - {Barcode}, ScannerID - {ScannerID}, ScannerSN - {ScannerSN}, Symbology - {Symbology}, Date - {CreateDateTime}";
             }
 
         }

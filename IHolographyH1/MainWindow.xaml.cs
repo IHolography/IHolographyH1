@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using IHolographyH1.Scaners;
 using System.Threading;
 using System.IO;
+using AppDefs;
 
 namespace IHolographyH1
 {
@@ -30,31 +31,18 @@ namespace IHolographyH1
             InitializeComponent();
 
             COM.OpenConnection();
-
+            Scan.ScannerAction = ScannerAction.Undefined;
             
-            Scanners scanners = new Scanners();
-            scanners.GetConnectedScanners(out string outXml);
-            scanners.RegisterForEvent();
-            scanners.ScanAction += GetScanAndPutInList;
+            Scan scan = new Scan(COM.CoreScannerObject);
+            
 
 
         }
 
-        public void GetScanAndPutInList(DataScan dataScan)
-        {
-            dataScans.Add(dataScan);
-        }
-        public void ShowDataScans()
-        {
-            foreach(DataScan dataScan in dataScans)
-            {
-                MessageBox.Show(dataScan.Barcode);
-            }
-        }
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            ShowDataScans();
+            Scan.ResetAlm();
         }
     }
 }
