@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace IHolographyH1
@@ -53,6 +51,70 @@ namespace IHolographyH1
                 ScannerSerialNumber = String.Empty;
                 ScanerID = String.Empty;
             }
+        }
+        public static int ParseXML(string xml, ref List<Scanner> ListConnectedScanners)
+        {
+            int status = (int)Status.Failed;
+            string scannerID = String.Empty;
+            string serialnumber = String.Empty;
+            string guid = String.Empty;
+            string vid = String.Empty;
+            string pid = String.Empty;
+            string modelnumber = String.Empty;
+            string dom = String.Empty;
+            string firmware = String.Empty;
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(xml);
+            XmlElement xRoot = xmlDoc.DocumentElement;
+            try
+            {
+                foreach (XmlNode xnode in xRoot)
+                {
+                    foreach (XmlNode childnode in xnode.ChildNodes)
+                    {
+                        if (childnode.Name == "scannerID")
+                        {
+                            scannerID = childnode.InnerText;
+                        }
+                        if (childnode.Name == "serialnumber")
+                        {
+                            serialnumber = childnode.InnerText;
+                        }
+                        if (childnode.Name == "GUID")
+                        {
+                            guid = childnode.InnerText;
+                        }
+                        if (childnode.Name == "VID")
+                        {
+                            vid = childnode.InnerText;
+                        }
+                        if (childnode.Name == "PID")
+                        {
+                            pid = childnode.InnerText;
+                        }
+                        if (childnode.Name == "modelnumber")
+                        {
+                            modelnumber = childnode.InnerText;
+                        }
+                        if (childnode.Name == "DoM")
+                        {
+                            dom = childnode.InnerText;
+                        }
+                        if (childnode.Name == "firmware")
+                        {
+                            firmware = childnode.InnerText;
+                        }
+                    }
+                    ListConnectedScanners.Add(new Scanner(scannerID, serialnumber, guid, vid, pid, modelnumber, dom, firmware));
+                }
+                if(!ListConnectedScanners.Any()) status = (int)Status.Success;
+            }
+            catch
+            {
+                Logger.Write("Couldn't parse XML with connected scanners");
+            }
+            return status;
         }
         private static string GetSymbology(int Code)
         {

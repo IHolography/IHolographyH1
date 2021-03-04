@@ -32,20 +32,36 @@ namespace IHolographyH1
             COM.OpenConnection();
             ScanListener.ScannerAction = ScannerAction.BoxScan;
             ScanListener scanListener = new ScanListener(COM.CoreScannerObject);
-            
+            scanListener.ScanEvent += Scan;
+
+
 
 
         }
 
-
+        private void Scan(DataScan s)
+        {
+            dataScans.Add(s);
+        }
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            ScanListener.ResetAlm();
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            ScanListener.SetSpecificAttribute("1",(int)BeepCode.FiveLongLow);
+        }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (DataScan s in dataScans)
+            {
+                MessageBox.Show(s.ToString());
+            }
+        }
+
+        private void button3_Click(object sender, RoutedEventArgs e)
+        {
+            dataGrid.ItemsSource = dataScans;
         }
     }
 }
