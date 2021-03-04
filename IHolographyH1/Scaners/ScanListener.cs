@@ -1,6 +1,5 @@
 ﻿using System;
 using CoreScanner;
-using System.Xml;
 using AppDefs;
 using System.Collections.Generic;
 using System.Threading;
