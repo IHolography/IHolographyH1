@@ -29,9 +29,10 @@ namespace IHolographyH1
             ListIdScannersWithException = new List<string>();
             CoreScannerObject = coreScannerObject;
             GetConnectedScanners();
-            RegisterForEvent();
+            SubscribeForBarcodeEvents();
             Logger.Write("Object created",this);
         }
+
         private void GetConnectedScanners()
         {
             if (GetConnectedScanners(out short numOfScanners) == (int)Status.Success)
@@ -43,9 +44,8 @@ namespace IHolographyH1
                 ConnectedScannersCount = 0;
             }
         }
-        private static int GetConnectedScanners(out short numOfScanners)
+        private int GetConnectedScanners(out short numOfScanners)
         {
-
             numOfScanners = 0;
             string xml = "";
             int status = (int)Status.Failed;
@@ -66,11 +66,10 @@ namespace IHolographyH1
             }
             return status;
         }
-        private int RegisterForEvent()
+        private int SubscribeForBarcodeEvents()
         {
-            // Subscribe for barcode events in cCoreScannerClass
             CoreScannerObject.BarcodeEvent += new
-            _ICoreScannerEvents_BarcodeEventEventHandler(OnBarcodeEvent);
+            _ICoreScannerEvents_BarcodeEventEventHandler(ActionOnBarcodeEvent);
 
             int eventIdCount = 1; // Number of events to register (only barcode events)
             int[] eventIdList = new int[eventIdCount];
@@ -114,7 +113,7 @@ namespace IHolographyH1
             }
             catch
             {
-                if (XMLReader.ScanerID == String.Empty)
+                if (XMLReader.ScanerID != String.Empty)
                 {
                     Logger.Write($"Scanner ID-{XMLReader.ScanerID} couldn't scan barcode", this);
                     Exception(XMLReader.ScanerID);
@@ -129,8 +128,7 @@ namespace IHolographyH1
                 //Log_Notify?.Invoke(DateTime.Now + "   Scanners GetDecodeBarcode() - Failed. " + ex.Message);
             }
         }
-        
-        private void OnBarcodeEvent(short eventType, ref string pscanData)
+        private void ActionOnBarcodeEvent(short eventType, ref string pscanData)
         {
                 GetDecodeBarcode(pscanData);
         }
@@ -154,7 +152,7 @@ namespace IHolographyH1
             SetAlm(scannerID);
             ListIdScannersWithException.Add(scannerID);
         }
-        public void ResetAlm()
+        public static void ResetAlm()
         {
             if (ListIdScannersWithException != null && ListIdScannersWithException.Count!=0)
             {
@@ -181,7 +179,7 @@ namespace IHolographyH1
         {
             SetSpecificAttribute(scannerID, (int)LEDCode.Led3On);
         }
-        private void OffRedLed(string scannerID)
+        private static void OffRedLed(string scannerID)
         {
             SetSpecificAttribute(scannerID, (int)LEDCode.Led3Off);
         }
@@ -189,7 +187,7 @@ namespace IHolographyH1
         {
             SetSpecificAttribute(scannerID, (int)BeepCode.ThreeLongLow);
         }
-        public void SetSpecificAttribute(string scannerID,int attributeCode)
+        public static void SetSpecificAttribute(string scannerID,int attributeCode)
         {
             int status = (int)Status.Failed;
             string outXml = String.Empty;

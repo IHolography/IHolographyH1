@@ -51,7 +51,7 @@ namespace IHolographyH1
       
         public static void Write(string message)
         {
-            WriteDoc($"date: {Variable.GetStringDateTime()}; message: {message}");
+            WriteDoc($"date: {Variable.GetStringDateTime()} ; message: {message}");
         }
         public static void Write(string message, object sender)
         {

@@ -51,7 +51,7 @@ namespace IHolographyH1
 
             if (status == (int)AppDefs.Status.Success)
             {
-                Logger.Write("Com connection for scanner is closed");
+                Logger.Write("Com connection for scanner is closed ");
             }
             else
             {

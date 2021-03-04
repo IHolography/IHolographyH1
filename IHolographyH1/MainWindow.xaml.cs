@@ -13,7 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using IHolographyH1.Scaners;
 using System.Threading;
 using System.IO;
 using AppDefs;
@@ -31,9 +30,8 @@ namespace IHolographyH1
             InitializeComponent();
 
             COM.OpenConnection();
-            Scan.ScannerAction = ScannerAction.Undefined;
-            
-            Scan scan = new Scan(COM.CoreScannerObject);
+            ScanListener.ScannerAction = ScannerAction.BoxScan;
+            ScanListener scanListener = new ScanListener(COM.CoreScannerObject);
             
 
 
@@ -42,7 +40,12 @@ namespace IHolographyH1
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            Scan.ResetAlm();
+            ScanListener.ResetAlm();
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            ScanListener.SetSpecificAttribute("1",(int)BeepCode.FiveLongLow);
         }
     }
 }
