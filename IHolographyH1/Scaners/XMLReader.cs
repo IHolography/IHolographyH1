@@ -64,11 +64,12 @@ namespace IHolographyH1
             string dom = String.Empty;
             string firmware = String.Empty;
 
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
-            XmlElement xRoot = xmlDoc.DocumentElement;
             try
             {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xml);
+                XmlElement xRoot = xmlDoc.DocumentElement;
+
                 foreach (XmlNode xnode in xRoot)
                 {
                     foreach (XmlNode childnode in xnode.ChildNodes)

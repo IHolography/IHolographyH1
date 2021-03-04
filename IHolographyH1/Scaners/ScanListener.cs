@@ -15,6 +15,9 @@ namespace IHolographyH1
         // Scan event
         public delegate void Scan(DataScan dataScan);
         public event Scan ScanEvent;
+        // Create object event
+        public delegate void _ScanListenerDel(Status status);
+        public static event _ScanListenerDel ScanListenerEvent;
         // Other diagnostic event
         #region DiagnosticEvents
         //public delegate void ScannersHandler(string message);
@@ -30,18 +33,38 @@ namespace IHolographyH1
         public ScanListener(CCoreScanner coreScannerObject)
         {
             CoreScannerObject = coreScannerObject;
-            GetConnectedScanners();
-            SubscribeForBarcodeEvents();
-            Logger.Write("Object created",this);
+            Status status = GetConnectedScanners();
+            if (status == Status.Success)
+            {
+                SubscribeForBarcodeEvents();
+                Logger.Write("Object ScanListener created", this);
+            }
+            else
+            {
+                Logger.Write("Object ScanListener don't create", this);
+            }
+            Check(status);
         }
-
-        private void GetConnectedScanners()
+        private void Check(Status status)
         {
+            ScanListenerEvent?.Invoke(status);
+        }
+        private Status GetConnectedScanners()
+        {
+            Status status = Status.Success;
             string outXML = String.Empty;
             List<Scanner> scanners = new List<Scanner>();
-            GetConnectedScanners(out string xml);
-            XMLReader.ParseXML(xml, ref scanners);
-            ListConnectedScanners = new List<Scanner>(scanners);
+            if (GetConnectedScanners(out string xml) == (int)Status.Success)
+            {
+                XMLReader.ParseXML(xml, ref scanners);
+                ListConnectedScanners = new List<Scanner>(scanners);
+            }
+            else
+            {
+                Logger.Write("Can't get scanners online. Check connected scanners");
+                status = Status.Failed;
+            }
+            return status;
         }
         private int GetConnectedScanners(out string outXml)
         {
@@ -63,6 +86,10 @@ namespace IHolographyH1
                 {
                     outXml = xml;
                     status = (int)AppDefs.Status.Success;
+                }
+                else
+                {
+                    status = (int)AppDefs.Status.Failed;
                 }
             }
             return status;
@@ -176,7 +203,7 @@ namespace IHolographyH1
                 //throw new Exception();
             }
         }
-        private async void Exception(Scanner scanner)
+        private void Exception(Scanner scanner)
         {
             SetAlarmAttributeOnScanner(scanner);
             ResetAlm(scanner);
@@ -197,7 +224,7 @@ namespace IHolographyH1
                     OffRedLed(scanner);
                     scanner.ResetException();
         }
-        private async void SetAlarmAttributeOnScanner(Scanner scanner)
+        private void SetAlarmAttributeOnScanner(Scanner scanner)
         {
             SetShortTermSpecificAttribute(scanner, (int)LEDCode.Led3On, 500);
             OnSpecificBeep(scanner);

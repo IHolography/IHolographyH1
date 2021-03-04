@@ -29,14 +29,20 @@ namespace IHolographyH1
     {
 
         List<DataScan> dataScans = new List<DataScan>();
+       
         public MainWindow()
         {
             InitializeComponent();
             TestThread();
+            //StartScannerListener();
         }
-        public async void TestThread()
+        public void TestThread()
         {
-            await Task.Run(() => StartScannerListener());
+            ScanListener.ScanListenerEvent += DeleteObject;
+            Thread thread = new Thread(new ThreadStart(StartScannerListener)) { Name="Test"};
+            thread.IsBackground = true;
+            thread.Start();
+            Thread.Sleep(200);
         }
         public void StartScannerListener()
         {
@@ -44,8 +50,15 @@ namespace IHolographyH1
             ScanListener.ScannerAction = ScannerAction.BoxScan;
             ScanListener scanListener = new ScanListener(COM.CoreScannerObject);
             scanListener.ScanEvent += Scan;
-            scanListener.ResetAlm();
-            
+            // MessageBox.Show(Thread.CurrentThread.ManagedThreadId.ToString());
+            //scanListener.Check();
+            // scanListener.ResetAlm();
+        }
+        private void DeleteObject(Status status)
+        {
+            //MessageBox.Show(status.ToString());
+            Logger.Write("Сработало событие");
+
         }
         private void Scan(DataScan scan)
         {
