@@ -22,26 +22,34 @@ namespace IHolographyH1
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+
+
     public partial class MainWindow : Window
     {
+
         List<DataScan> dataScans = new List<DataScan>();
         public MainWindow()
         {
             InitializeComponent();
-
+            TestThread();
+        }
+        public async void TestThread()
+        {
+            await Task.Run(() => StartScannerListener());
+        }
+        public void StartScannerListener()
+        {
             COM.OpenConnection();
             ScanListener.ScannerAction = ScannerAction.BoxScan;
             ScanListener scanListener = new ScanListener(COM.CoreScannerObject);
             scanListener.ScanEvent += Scan;
-
-
-
-
+            scanListener.ResetAlm();
+            
         }
-
-        private void Scan(DataScan s)
+        private void Scan(DataScan scan)
         {
-            dataScans.Add(s);
+            MessageBox.Show(scan.ToString());
         }
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -49,6 +57,7 @@ namespace IHolographyH1
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
+
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)

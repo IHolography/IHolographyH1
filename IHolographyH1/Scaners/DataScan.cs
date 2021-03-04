@@ -19,12 +19,13 @@ namespace IHolographyH1
                 Barcode = barcode;
                 Symbology = symbology;
                 ScannerAction = scannerAction;
-                Scanner = scanner;
+                Scanner = (Scanner)scanner.Clone();
                 CreateDateTime = Variable.GetStringDateTime();
             }
             public override string ToString()
             {
-                return $"Data scan: action - {ScannerAction}, barcode - {Barcode}, ScannerID - {Scanner.ScannerID}, ScannerSN - {Scanner.Serialnumber}, Symbology - {Symbology}, Date - {CreateDateTime}";
+            return $"Data scan: action - {ScannerAction}, barcode - {Barcode}"+
+                   $", ScannerID - {Scanner.ScannerID}, ScannerSN - {Scanner.Serialnumber}, Symbology - {Symbology}, Date - {CreateDateTime}";
             }
 
         }

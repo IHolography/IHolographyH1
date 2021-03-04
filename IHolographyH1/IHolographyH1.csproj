@@ -58,12 +58,15 @@
     </ApplicationDefinition>
     <Compile Include="AppDefs.cs" />
     <Compile Include="BOX\Box.cs" />
+    <Compile Include="IScanListener.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Scaners\DataScan.cs" />
     <Compile Include="Scaners\COM.cs" />
     <Compile Include="Scaners\ScanListener.cs" />
     <Compile Include="Scaners\Scanner.cs" />
     <Compile Include="Scaners\XMLReader.cs" />
+    <Compile Include="Weight\DataWeight.cs" />
+    <Compile Include="Weight\WeightListener.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

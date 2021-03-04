@@ -5,6 +5,8 @@ using AppDefs;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
+using System.Windows;
+using System.Threading.Tasks;
 
 namespace IHolographyH1
 {
@@ -36,23 +38,10 @@ namespace IHolographyH1
         private void GetConnectedScanners()
         {
             string outXML = String.Empty;
-            if (GetConnectedScanners(out string xml) == (int)Status.Success)
-            {
-                List<Scanner> scanners = new List<Scanner>();
-
-                if(XMLReader.ParseXML(xml, ref scanners)==(int)Status.Success)
-                {
-                    ListConnectedScanners = new List<Scanner>(scanners);
-                }
-                else
-                {
-                    ListConnectedScanners = new List<Scanner>();
-                }
-            }
-            else
-            {
-                ListConnectedScanners = new List<Scanner>();
-            }
+            List<Scanner> scanners = new List<Scanner>();
+            GetConnectedScanners(out string xml);
+            XMLReader.ParseXML(xml, ref scanners);
+            ListConnectedScanners = new List<Scanner>(scanners);
         }
         private int GetConnectedScanners(out string outXml)
         {
@@ -119,9 +108,9 @@ namespace IHolographyH1
         private void GetDecodeBarcode(string strXml)
         {
             try 
-            { 
+            {
                 XMLReader.ParseXML(strXml);
-                GetDataScan(XMLReader.Barcode, XMLReader.ScannerSerialNumber, XMLReader.Symbology, XMLReader.ScanerID);
+                GetDataScan(XMLReader.Barcode, XMLReader.Symbology, XMLReader.ScanerID);
             }
             catch
             {
@@ -146,16 +135,39 @@ namespace IHolographyH1
         }
         private Scanner GetScannerById(string scannerID)
         {
-            var scanner = ListConnectedScanners.Where(scan => scan.ScannerID.Equals(scannerID));
-            return (Scanner)scanner;
+            foreach (Scanner scanner in ListConnectedScanners)
+            {
+                if (scanner.ScannerID == scannerID)
+                {
+                    return scanner;
+                }
+            }
+            return ListConnectedScanners.FirstOrDefault();
         }
-        private void GetDataScan(string barcode, string scannerSN, string symbology, string scannerID)
+        private void GetDataScan(string barcode, string symbology, string scannerID)
         {
             if (ScannerAction != ScannerAction.Undefined)
             {
-                ScanEventInfo = new DataScan(barcode, symbology, ScannerAction, GetScannerById(scannerID));
+                Scanner scanner = GetScannerById(scannerID);
+                ScanEventInfo = new DataScan(barcode, symbology, ScannerAction, scanner);
                 Logger.Write(ScanEventInfo.ToString(), this);
-                ScanEvent?.Invoke(ScanEventInfo);
+                if (scanner.ScannerException == Alm.Ok)
+                {
+                    try
+                    {
+                        ScanEvent?.Invoke(ScanEventInfo);
+                    }
+                    catch
+                    {
+                        Logger.Write("GetDataScan(): ScanEvent in other thread");
+                        Exception(scanner);
+                    }
+                }
+                else
+                {
+                    Logger.Write("Try scan in scanner with alarm");
+                    Exception(scanner);
+                }
             }
             else
             {
@@ -164,24 +176,30 @@ namespace IHolographyH1
                 //throw new Exception();
             }
         }
-        private void Exception(Scanner scanner)
+        private async void Exception(Scanner scanner)
         {
             SetAlarmAttributeOnScanner(scanner);
+            ResetAlm(scanner);
         }
         public void ResetAlm()
         {
-            foreach(Scanner scanner1 in ListConnectedScanners)
+            foreach(Scanner scanner in ListConnectedScanners)
             {
-                if (scanner1.ScannerException==Alm.Alarm)
+                if (scanner.ScannerException==Alm.Alarm)
                 {
-                    OffRedLed(scanner1);
-                    scanner1.ResetException();
+                    OffRedLed(scanner);
+                    scanner.ResetException();
                 }
             }
         }
-        private void SetAlarmAttributeOnScanner(Scanner scanner)
+        public void ResetAlm(Scanner scanner)
         {
-            OnRedLed(scanner);
+                    OffRedLed(scanner);
+                    scanner.ResetException();
+        }
+        private async void SetAlarmAttributeOnScanner(Scanner scanner)
+        {
+            SetShortTermSpecificAttribute(scanner, (int)LEDCode.Led3On, 500);
             OnSpecificBeep(scanner);
             scanner.SetException();
         }
@@ -195,7 +213,7 @@ namespace IHolographyH1
         }
         private void OnSpecificBeep(Scanner scanner)
         {
-            SetSpecificAttribute(scanner, (int)BeepCode.ThreeLongLow);
+            SetSpecificAttribute(scanner, (int)BeepCode.ThreeShortLow);
         }
         public void SetSpecificAttribute(Scanner scanner, int attributeCode)
         {
