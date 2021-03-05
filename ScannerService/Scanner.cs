@@ -1,7 +1,7 @@
-﻿using AppDefs;
+﻿
 using System;
 
-namespace IHolographyH1
+namespace ScannerService
 {
     public class Scanner : ICloneable
     {
@@ -14,7 +14,6 @@ namespace IHolographyH1
         public string DoM { get; private set; }
         public string Firmware { get; private set; }
         public Alm ScannerException { get; private set; }
-        //public Scanner(){}
         public Scanner(string ScannerID, string Serialnumber, string GUID, string VID, string PID, string Modelnumber, string DoM, string Firmware)
         {
             ScannerException = Alm.Ok;

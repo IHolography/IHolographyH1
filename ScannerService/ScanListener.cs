@@ -1,21 +1,19 @@
 ﻿using System;
 using CoreScanner;
-using AppDefs;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-using System.Windows;
-using System.Threading.Tasks;
+using Logger;
 
-namespace IHolographyH1
+namespace ScannerService
 {
-    class ScanListener
+    public class ScanListener
     {
         // Scan event
         public delegate void Scan(DataScan dataScan);
         public event Scan ScanEvent;
         // Create object event
-        public delegate void _ScanListenerDel(Status status);
+        public delegate void _ScanListenerDel(int status);
         public static event _ScanListenerDel ScanListenerEvent;
         // Other diagnostic event
         #region DiagnosticEvents
@@ -26,7 +24,7 @@ namespace IHolographyH1
 
         public static CCoreScanner CoreScannerObject { get; private set; }
         public DataScan ScanEventInfo { get; private set; }
-        public static ScannerAction ScannerAction { get; set; }
+        public static int ScannerAction { get; set; }
         public List<Scanner> ListConnectedScanners { get; private set; }
 
         public ScanListener(CCoreScanner coreScannerObject)
@@ -36,17 +34,17 @@ namespace IHolographyH1
             if (status == Status.Success)
             {
                 SubscribeForBarcodeEvents();
-                Logger.Write("Object ScanListener created", this);
+                Log.Write("Object ScanListener created", this);
             }
             else
             {
-                Logger.Write("Object ScanListener don't create", this);
+                Log.Write("Object ScanListener don't create", this);
             }
             Check(status);
         }
         private void Check(Status status)
         {
-            ScanListenerEvent?.Invoke(status);
+            ScanListenerEvent?.Invoke((int)status);
         }
         private Status GetConnectedScanners()
         {
@@ -60,7 +58,7 @@ namespace IHolographyH1
             }
             else
             {
-                Logger.Write("Can't get scanners online. Check connected scanners");
+                Log.Write("Can't get scanners online. Check connected scanners");
                 status = Status.Failed;
             }
             return status;
@@ -84,11 +82,11 @@ namespace IHolographyH1
                 if (status == (int)Status.Success && numOfScanners > 0)
                 {
                     outXml = xml;
-                    status = (int)AppDefs.Status.Success;
+                    status = (int)Status.Success;
                 }
                 else
                 {
-                    status = (int)AppDefs.Status.Failed;
+                    status = (int)Status.Failed;
                 }
             }
             return status;
@@ -113,7 +111,7 @@ namespace IHolographyH1
 
             int opCode = (int)Opcode.RegisterForEvents;
             string outXml = "";
-            int status = (int)AppDefs.Status.Failed;
+            int status = (int)Status.Failed;
 
             // Call register for events
             COM.CoreScannerObject.ExecCommand(opCode,  // Opcode: Register for events
@@ -142,7 +140,7 @@ namespace IHolographyH1
             {
                 if (XMLReader.ScanerID != String.Empty)
                 {
-                    Logger.Write($"Scanner ID-{XMLReader.ScanerID} couldn't scan barcode", this);
+                    Log.Write($"Scanner ID-{XMLReader.ScanerID} couldn't scan barcode", this);
                     Exception(GetScannerById(XMLReader.ScanerID));
                 }
                 else
@@ -172,11 +170,11 @@ namespace IHolographyH1
         }
         private void GetDataScan(string barcode, string symbology, string scannerID)
         {
-            if (ScannerAction != ScannerAction.Undefined)
+            if (ScannerAction != (int)ScanAction.Undefined)
             {
                 Scanner scanner = GetScannerById(scannerID);
                 ScanEventInfo = new DataScan(barcode, symbology, ScannerAction, scanner);
-                Logger.Write(ScanEventInfo.ToString(), this);
+                Log.Write(ScanEventInfo.ToString(), this);
                 if (scanner.ScannerException == Alm.Ok)
                 {
                     try
@@ -185,19 +183,19 @@ namespace IHolographyH1
                     }
                     catch
                     {
-                        Logger.Write("GetDataScan(): ScanEvent in other thread");
+                        Log.Write("GetDataScan(): ScanEvent in other thread");
                         Exception(scanner);
                     }
                 }
                 else
                 {
-                    Logger.Write("Try scan in scanner with alarm");
+                    Log.Write("Try scan in scanner with alarm");
                     Exception(scanner);
                 }
             }
             else
             {
-                Logger.Write("Scanner action undefined. ScanData not available on this scan.", this);
+                Log.Write("Scanner action undefined. ScanData not available on this scan.", this);
                 Exception(GetScannerById(scannerID));
                 //throw new Exception();
             }

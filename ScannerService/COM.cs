@@ -1,12 +1,7 @@
 ﻿using CoreScanner;
-using AppDefs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Logger;
 
-namespace IHolographyH1
+namespace ScannerService
 {
     public static class COM
     {
@@ -31,11 +26,11 @@ namespace IHolographyH1
                                        scannerTypes,         // Array of scanner types    
                                        NumberOfScannerTypes, // Length of scanner types array 
                                        out status);          // Command execution success/failure return status 
-                Logger.Write("Com connection for scanner is open");
+                Log.Write("Com connection for scanner is open");
             }
             catch
             {
-                Logger.Write("Com connection for scanner failed");
+                Log.Write("Com connection for scanner failed");
             }
             Status =  status;
         }
@@ -49,13 +44,13 @@ namespace IHolographyH1
             CoreScannerObject.Close(appHandle,   // Application handle
                                     out status); // Command execution success/failure return status 
 
-            if (status == (int)AppDefs.Status.Success)
+            if (status == (int)ScannerService.Status.Success)
             {
-                Logger.Write("Com connection for scanner is closed ");
+                Log.Write("Com connection for scanner is closed ");
             }
             else
             {
-                Logger.Write("Com connection for scanner closing failed; COM.CloseConnection()");
+                Log.Write("Com connection for scanner closing failed; COM.CloseConnection()");
             }
             Status = status;
         }

@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AppDefs;
-
-namespace IHolographyH1
+﻿
+namespace ScannerService
 {
         public class DataScan
         {
             public string Barcode { get; private set; }
             public string Symbology { get; private set; }
-            public ScannerAction ScannerAction { get; private set; }
+            public int ScannerAction { get; private set; }
             public Scanner Scanner { get; private set; }
-        public string CreateDateTime { get; private set; }
-            public DataScan(string barcode, string symbology, ScannerAction scannerAction, Scanner scanner)
+            public static string DateTimeFormat { get; private set; }
+            public string CreateDateTime { get; private set; }
+            public DataScan(string barcode, string symbology, int scannerAction, Scanner scanner)
             {
+                DateTimeFormat = "G";
                 Barcode = barcode;
                 Symbology = symbology;
                 ScannerAction = scannerAction;
                 Scanner = (Scanner)scanner.Clone();
-                CreateDateTime = Variable.GetStringDateTime();
+                CreateDateTime = Variable.GetStringDateTime(DateTimeFormat);
             }
             public override string ToString()
             {

@@ -1,10 +1,11 @@
-﻿using AppDefs;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Logger;
 
-namespace IHolographyH1
+namespace ScannerService
 {
     public static class XMLReader
     {
@@ -113,7 +114,7 @@ namespace IHolographyH1
             }
             catch
             {
-                Logger.Write("Couldn't parse XML with connected scanners");
+                Log.Write("Couldn't parse XML with connected scanners");
             }
             return status;
         }

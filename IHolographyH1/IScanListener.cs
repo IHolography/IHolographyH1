@@ -1,21 +1,10 @@
 ﻿using AppDefs;
-using CoreScanner;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ScannerService;
 
 namespace IHolographyH1
 {
     interface IScanListener
     {
-        ScanListener ScanListener { get; set; }
-        CCoreScanner CoreScannerObject { get; set; }
-        DataScan ScanEventInfo { get; set; }
-        ScannerAction ScannerAction { get; set; }
-        List<Scanner> ListConnectedScanners { get; set; }
-
         void StartScannListenerInNewThread();
         void StoptScannListenerInNewThread();
         void OpenConnection();
@@ -26,6 +15,6 @@ namespace IHolographyH1
         void GetScanEvent(DataScan dataScan);
         //Подписки на событие
         void Scan(DataScan dataScan);
-        void CheckCreatedScannerLister(Status status);
+        void CheckCreatedScannerLister(int status);
     }
 }

@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.IO;
 using AppDefs;
+using Logger;
+using ScannerService;
 
 namespace IHolographyH1
 {
@@ -29,17 +31,19 @@ namespace IHolographyH1
     {
 
         List<DataScan> dataScans = new List<DataScan>();
+        
        
         public MainWindow()
         {
             InitializeComponent();
             TestThread();
+            Log.LogEnable = true;
             //StartScannerListener();
         }
         public void TestThread()
         {
             ScanListener.ScanListenerEvent += DeleteObject;
-            Thread thread = new Thread(new ThreadStart(StartScannerListener)) { Name="Test"};
+            Thread thread = new Thread(new ThreadStart(StartScannerListener)) { Name="BackgroundScannersThread"};
             thread.IsBackground = true;
             thread.Start();
             Thread.Sleep(200);
@@ -47,22 +51,23 @@ namespace IHolographyH1
         public void StartScannerListener()
         {
             COM.OpenConnection();
-            ScanListener.ScannerAction = ScannerAction.BoxScan;
+            ScanListener.ScannerAction = (int)ScannerAction.BoxScan;
             ScanListener scanListener = new ScanListener(COM.CoreScannerObject);
             scanListener.ScanEvent += Scan;
             // MessageBox.Show(Thread.CurrentThread.ManagedThreadId.ToString());
             //scanListener.Check();
             // scanListener.ResetAlm();
         }
-        private void DeleteObject(Status status)
+
+        public void DeleteObject(int status)
         {
-            //MessageBox.Show(status.ToString());
-            Logger.Write("Сработало событие");
+            MessageBox.Show(status.ToString());
+            //Log.Write("Сработало событие");
 
         }
         private void Scan(DataScan scan)
         {
-            MessageBox.Show(scan.ToString());
+            //MessageBox.Show(scan.ToString());
         }
         private void button_Click(object sender, RoutedEventArgs e)
         {

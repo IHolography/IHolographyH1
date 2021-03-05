@@ -57,16 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppDefs.cs" />
-    <Compile Include="BOX\Box.cs" />
     <Compile Include="IScanListener.cs" />
-    <Compile Include="Logger\Logger.cs" />
-    <Compile Include="Scaners\DataScan.cs" />
-    <Compile Include="Scaners\COM.cs" />
-    <Compile Include="Scaners\ScanListener.cs" />
-    <Compile Include="Scaners\Scanner.cs" />
-    <Compile Include="Scaners\XMLReader.cs" />
-    <Compile Include="Weight\DataWeight.cs" />
-    <Compile Include="Weight\WeightListener.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -75,8 +66,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DB\Connection.cs" />
-    <Compile Include="DB\IReadDataInAppLoad.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -119,6 +108,15 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Logger\Logger.csproj">
+      <Project>{baf3c128-bec5-4327-b739-cca31d3e073b}</Project>
+      <Name>Logger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScannerService\ScannerService.csproj">
+      <Project>{b254d94e-1c7a-4d37-8c4b-2457a455e17b}</Project>
+      <Name>ScannerService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
