@@ -7,7 +7,7 @@ namespace ScannerService
             public string Symbology { get; private set; }
             public int ScannerAction { get; private set; }
             public Scanner Scanner { get; private set; }
-            public static string DateTimeFormat { get; private set; }
+            public static string DateTimeFormat { get; set; }
             public string CreateDateTime { get; private set; }
             public DataScan(string barcode, string symbology, int scannerAction, Scanner scanner)
             {

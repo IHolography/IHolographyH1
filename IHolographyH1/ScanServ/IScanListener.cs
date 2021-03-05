@@ -5,8 +5,8 @@ namespace IHolographyH1
 {
     interface IScanListener
     {
-        void StartScannListenerInNewThread();
-        void StoptScannListenerInNewThread();
+        void StartScannListener();
+        void StoptScannListener();
         void OpenConnection();
         void CloseConnection();
         void ResetAlm();

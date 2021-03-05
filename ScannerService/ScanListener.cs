@@ -13,8 +13,8 @@ namespace ScannerService
         public delegate void Scan(DataScan dataScan);
         public event Scan ScanEvent;
         // Create object event
-        public delegate void _ScanListenerDel(int status);
-        public static event _ScanListenerDel ScanListenerEvent;
+        public delegate void ScanListenerException(int status, string messge);
+        public static event ScanListenerException ScanListenerEx;
         // Other diagnostic event
         #region DiagnosticEvents
         //public delegate void ScannersHandler(string message);
@@ -38,13 +38,13 @@ namespace ScannerService
             }
             else
             {
-                Log.Write("Object ScanListener don't create", this);
+                Log.Write("Object ScanListener don't create. Check connected scanners.", this);
             }
             Check(status);
         }
         private void Check(Status status)
         {
-            ScanListenerEvent?.Invoke((int)status);
+          if (status==Status.Failed) ScanListenerEx?.Invoke((int)Status.Failed, "Object ScanListener is not created. Check initialize static fields or connected scanners.");
         }
         private Status GetConnectedScanners()
         {
@@ -59,6 +59,7 @@ namespace ScannerService
             else
             {
                 Log.Write("Can't get scanners online. Check connected scanners");
+                ScanListenerEx?.Invoke((int)Status.Failed, "Can't get scanners online. Check connected scanners");
                 status = Status.Failed;
             }
             return status;
@@ -125,7 +126,7 @@ namespace ScannerService
             }
             else
             {
-                //Log_Notify?.Invoke(DateTime.Now + "   Scanners RegisterForEvents() - Failed. Error Code : " + status);
+                throw new Exception($"ScanListener can't subscribe for barcode events. Xml file for command: {inXml}");
             }
             return status;
         }
@@ -136,7 +137,7 @@ namespace ScannerService
                 XMLReader.ParseXML(strXml);
                 GetDataScan(XMLReader.Barcode, XMLReader.Symbology, XMLReader.ScanerID);
             }
-            catch
+            catch (Exception ex)
             {
                 if (XMLReader.ScanerID != String.Empty)
                 {
@@ -151,6 +152,7 @@ namespace ScannerService
                     }
                 }
                 //Log_Notify?.Invoke(DateTime.Now + "   Scanners GetDecodeBarcode() - Failed. " + ex.Message);
+                ScanListenerEx?.Invoke((int)Status.Success, "Scanners GetDecodeBarcode() - Failed. " + ex.Message);
             }
         }
         private void ActionOnBarcodeEvent(short eventType, ref string pscanData)
@@ -185,19 +187,21 @@ namespace ScannerService
                     {
                         Log.Write("GetDataScan(): ScanEvent in other thread");
                         Exception(scanner);
+                        ScanListenerEx?.Invoke((int)Status.Failed,$"ScannerService.ScanListener.GetDataScan(): ScanEvent can't invoke. Sender:{this}");
                     }
                 }
                 else
                 {
-                    Log.Write("Try scan in scanner with alarm");
+                    Log.Write($"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
                     Exception(scanner);
+                    ScanListenerEx?.Invoke((int)Status.Success, $"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
                 }
             }
             else
             {
                 Log.Write("Scanner action undefined. ScanData not available on this scan.", this);
                 Exception(GetScannerById(scannerID));
-                //throw new Exception();
+                ScanListenerEx?.Invoke((int)Status.Success, $"Scanner action undefined. ScanData not available on this scan. {this}");
             }
         }
         private void Exception(Scanner scanner)
