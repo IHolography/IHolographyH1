@@ -5,6 +5,11 @@
 namespace ScannerService
 {
     #region Enum
+    public enum Mode
+    {
+        Test = 0,
+        Work = 1
+    }
     public enum Alm
     {
         Undefined = 0,

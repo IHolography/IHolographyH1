@@ -25,10 +25,13 @@ namespace ScannerService
         public static CCoreScanner CoreScannerObject { get; private set; }
         public DataScan ScanEventInfo { get; private set; }
         public static int ScannerAction { get; set; }
+        public static int ScannerMode { get; set; }
         public List<Scanner> ListConnectedScanners { get; private set; }
 
         public ScanListener(CCoreScanner coreScannerObject)
         {
+            ScannerAction = (int)ScanAction.Undefined;
+            ScannerMode = (int)Mode.Work;
             CoreScannerObject = coreScannerObject;
             Status status = GetConnectedScanners();
             if (status == Status.Success)
@@ -102,6 +105,8 @@ namespace ScannerService
             // Register for barcode events only
             eventIdList[0] = (int)EventType.Barcode;
 
+            
+
             string eventIds = String.Join(",", eventIdList);
             string inXml = "<inArgs>" +
                            "<cmdArgs>" +
@@ -129,6 +134,20 @@ namespace ScannerService
                 throw new Exception($"ScanListener can't subscribe for barcode events. Xml file for command: {inXml}");
             }
             return status;
+        }
+        public int UnSubscribeForBarcodeEvents()
+        {
+            int res = (int)Status.Failed;
+            try
+            {
+                CoreScannerObject.BarcodeEvent -= new
+                 _ICoreScannerEvents_BarcodeEventEventHandler(ActionOnBarcodeEvent);
+                res = (int)Status.Success;
+            }
+            catch 
+            { 
+            }
+            return res;
         }
         private void GetDecodeBarcode(string strXml)
         {
@@ -172,36 +191,48 @@ namespace ScannerService
         }
         private void GetDataScan(string barcode, string symbology, string scannerID)
         {
-            if (ScannerAction != (int)ScanAction.Undefined)
+            if (ScannerMode==(int)Mode.Work)
             {
-                Scanner scanner = GetScannerById(scannerID);
-                ScanEventInfo = new DataScan(barcode, symbology, ScannerAction, scanner);
-                Log.Write(ScanEventInfo.ToString(), this);
-                if (scanner.ScannerException == Alm.Ok)
+                if (ScannerAction != (int)ScanAction.Undefined)
                 {
-                    try
-                    {
-                        ScanEvent?.Invoke(ScanEventInfo);
-                    }
-                    catch
-                    {
-                        Log.Write("GetDataScan(): ScanEvent in other thread");
-                        Exception(scanner);
-                        ScanListenerEx?.Invoke((int)Status.Failed,$"ScannerService.ScanListener.GetDataScan(): ScanEvent can't invoke. Sender:{this}");
-                    }
+                    GetData(barcode, symbology, scannerID);
                 }
                 else
                 {
-                    Log.Write($"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
-                    Exception(scanner);
-                    ScanListenerEx?.Invoke((int)Status.Success, $"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
+                    Log.Write("Scanner action undefined. ScanData not available on this scan.", this);
+                    Exception(GetScannerById(scannerID));
+                    ScanListenerEx?.Invoke((int)Status.Success, $"Scanner action undefined. ScanData not available on this scan. {this}");
                 }
             }
             else
             {
-                Log.Write("Scanner action undefined. ScanData not available on this scan.", this);
-                Exception(GetScannerById(scannerID));
-                ScanListenerEx?.Invoke((int)Status.Success, $"Scanner action undefined. ScanData not available on this scan. {this}");
+                GetData(barcode, symbology, scannerID);
+            }
+           
+        }
+        private void GetData(string barcode, string symbology, string scannerID)
+        {
+            Scanner scanner = GetScannerById(scannerID);
+            ScanEventInfo = new DataScan(barcode, symbology, ScannerAction, scanner);
+            Log.Write(ScanEventInfo.ToString(), this);
+            if (scanner.ScannerException == Alm.Ok)
+            {
+                try
+                {
+                    ScanEvent?.Invoke(ScanEventInfo);
+                }
+                catch
+                {
+                    Log.Write("GetDataScan(): ScanEvent in other thread");
+                    Exception(scanner);
+                    ScanListenerEx?.Invoke((int)Status.Failed, $"ScannerService.ScanListener.GetDataScan(): ScanEvent can't invoke. Sender:{this}");
+                }
+            }
+            else
+            {
+                Log.Write($"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
+                Exception(scanner);
+                ScanListenerEx?.Invoke((int)Status.Success, $"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
             }
         }
         private void Exception(Scanner scanner)

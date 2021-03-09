@@ -3,18 +3,19 @@ using ScannerService;
 
 namespace IHolographyH1
 {
-    interface IScanListener
+    public interface IScanListener
     {
         void StartScannListener();
-        void StoptScannListener();
-        void OpenConnection();
-        void CloseConnection();
+        void StopScannListener();
+        void SetScanProductOrBoxProperties(ScannerAction scanAction);
+        void SetScannerMode(AppDefs.Mode mode);
         void ResetAlm();
         void SetSpecificAttribute(Scanner scanner, int attributeCode);
         void SetShortTermSpecificAttribute(Scanner scanner, int attributeCode, int milisecond);
-        void GetScanEvent(DataScan dataScan);
-        //Подписки на событие
-        void Scan(DataScan dataScan);
-        void CheckCreatedScannerLister(int status);
+        void SubscribeScanEvent();
+        void SubscribeCheckCreatedScannerListerEvent();
+        //Event TODO
+        void ScanEvent(DataScan dataScan);
+        void CheckCreatedScannerListerEvent(int status, string message);
     }
 }

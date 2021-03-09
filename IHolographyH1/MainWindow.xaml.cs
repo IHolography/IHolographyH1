@@ -31,35 +31,60 @@ namespace IHolographyH1
     {
 
         List<DataScan> dataScans = new List<DataScan>();
-        
-       
+        ScannerManager scanListen;
+
+
         public MainWindow()
         {
-            
-            StartScanListen scanListen = new StartScanListen();
+            //StartScanListen scanListen = new StartScanListen();
             //scanListen.SetScanProductOrBoxProperties(ScannerAction.BoxScan);
-            scanListen.StartScannListener();
+            //scanListen.StartScannListener();
         }
         private void button_Click(object sender, RoutedEventArgs e)
         {
+
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-
+            ScannerManager.FailedAppEvent += CloseApp;
+            try
+            {
+                scanListen = new ScannerManager();
+                scanListen.StartScannListener();
+            }
+            catch 
+            {
+                Log.Write("Application failed");
+                Application.Current.Shutdown();
+            }
         }
-
+        private void CloseApp(string mess)
+        {
+            Log.Write(mess);
+            MessageBox.Show("SSSs");
+            //Application.Current.Shutdown();
+        }
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             foreach (DataScan s in dataScans)
             {
-                MessageBox.Show(s.ToString());
+                MessageBox.Show(s.ToString()+sender.ToString());
             }
         }
 
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             dataGrid.ItemsSource = dataScans;
+        }
+
+        private void button4_Click(object sender, RoutedEventArgs e)
+        {
+            if (scanListen != null)
+            {
+                scanListen.StopScannListener();
+            }
+            //scanListen = null;
         }
     }
 }
