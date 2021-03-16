@@ -18,6 +18,8 @@ using System.IO;
 using AppDefs;
 using Logger;
 using ScannerService;
+using WeigherService;
+using System.IO.Ports;
 
 namespace IHolographyH1
 {
@@ -32,6 +34,7 @@ namespace IHolographyH1
 
         List<DataScan> dataScans = new List<DataScan>();
         ScannerManager scanListen;
+        Weigher weigher;
 
 
         public MainWindow()
@@ -39,6 +42,9 @@ namespace IHolographyH1
             //StartScanListen scanListen = new StartScanListen();
             //scanListen.SetScanProductOrBoxProperties(ScannerAction.BoxScan);
             //scanListen.StartScannListener();
+
+            weigher = new Weigher("COM2", 9600, Parity.None, StopBits.Two, 8, 5, AppDefs.Constant.LogEnable, AppDefs.Variable.DateTimeFormat, AppDefs.Constant.LogFilePath);
+            weigher.WeighFinish += ShowMess;
         }
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -85,6 +91,16 @@ namespace IHolographyH1
                 scanListen.StopScannListener();
             }
             //scanListen = null;
+        }
+
+        private void button5_Click(object sender, RoutedEventArgs e)
+        {
+            weigher.GetData();
+        }
+        private void ShowMess(float val)
+        {
+            MessageBox.Show(val.ToString());
+
         }
     }
 }

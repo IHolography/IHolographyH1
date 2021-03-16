@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerService", "ScannerSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csproj", "{BAF3C128-BEC5-4327-B739-CCA31D3E073B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerServiceTests", "ScannerServiceTests\ScannerServiceTests.csproj", "{3AD87991-9697-4843-8DD1-2BEA24CF78BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeigherService", "WeigherService\WeigherService.csproj", "{B59265B7-0365-4FC8-83A2-2D62451495C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{BAF3C128-BEC5-4327-B739-CCA31D3E073B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAF3C128-BEC5-4327-B739-CCA31D3E073B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAF3C128-BEC5-4327-B739-CCA31D3E073B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3AD87991-9697-4843-8DD1-2BEA24CF78BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AD87991-9697-4843-8DD1-2BEA24CF78BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AD87991-9697-4843-8DD1-2BEA24CF78BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AD87991-9697-4843-8DD1-2BEA24CF78BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B59265B7-0365-4FC8-83A2-2D62451495C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B59265B7-0365-4FC8-83A2-2D62451495C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B59265B7-0365-4FC8-83A2-2D62451495C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B59265B7-0365-4FC8-83A2-2D62451495C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -146,6 +146,10 @@
       <Project>{b254d94e-1c7a-4d37-8c4b-2457a455e17b}</Project>
       <Name>ScannerService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WeigherService\WeigherService.csproj">
+      <Project>{b59265b7-0365-4fc8-83a2-2d62451495c6}</Project>
+      <Name>WeigherService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
