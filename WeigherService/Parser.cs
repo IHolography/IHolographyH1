@@ -112,7 +112,8 @@ namespace WeigherService
                     }
                 }
                 result += (valueWithoutHW + valueWithHW);
-                return result / 4;
+                result = result / 4;
+                return (result>0?result:0);
             }
             catch(Exception ex)
             {

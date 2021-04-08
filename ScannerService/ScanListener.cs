@@ -24,13 +24,13 @@ namespace ScannerService
 
         public static CCoreScanner CoreScannerObject { get; private set; }
         public DataScan ScanEventInfo { get; private set; }
-        public static int ScannerAction { get; set; }
+        //public static int ScannerAction { get; set; }
         public static int ScannerMode { get; set; }
         public List<Scanner> ListConnectedScanners { get; private set; }
 
         public ScanListener(CCoreScanner coreScannerObject)
         {
-            ScannerAction = (int)ScanAction.Undefined;
+            //ScannerAction = (int)ScanAction.Undefined;
             ScannerMode = (int)Mode.Work;
             CoreScannerObject = coreScannerObject;
             Status status = GetConnectedScanners();
@@ -140,8 +140,7 @@ namespace ScannerService
             int res = (int)Status.Failed;
             try
             {
-                CoreScannerObject.BarcodeEvent -= new
-                 _ICoreScannerEvents_BarcodeEventEventHandler(ActionOnBarcodeEvent);
+                CoreScannerObject.BarcodeEvent -= ActionOnBarcodeEvent;
                 res = (int)Status.Success;
             }
             catch 
@@ -191,29 +190,29 @@ namespace ScannerService
         }
         private void GetDataScan(string barcode, string symbology, string scannerID)
         {
-            if (ScannerMode==(int)Mode.Work)
-            {
-                if (ScannerAction != (int)ScanAction.Undefined)
-                {
+            //if (ScannerMode==(int)Mode.Work)
+            //{
+            //    if (ScannerAction != (int)ScanAction.Undefined)
+            //    {
                     GetData(barcode, symbology, scannerID);
-                }
-                else
-                {
-                    Log.Write("Scanner action undefined. ScanData not available on this scan.", this);
-                    Exception(GetScannerById(scannerID));
-                    ScanListenerEx?.Invoke((int)Status.Success, $"Scanner action undefined. ScanData not available on this scan. {this}");
-                }
-            }
-            else
-            {
-                GetData(barcode, symbology, scannerID);
-            }
+            //    }
+            //    else
+            //    {
+            //        Log.Write("Scanner action undefined. ScanData not available on this scan.", this);
+            //        Exception(GetScannerById(scannerID));
+            //        ScanListenerEx?.Invoke((int)Status.Success, $"Scanner action undefined. ScanData not available on this scan. {this}");
+            //    }
+            //}
+            //else
+            //{
+            //    GetData(barcode, symbology, scannerID);
+            //}
            
         }
         private void GetData(string barcode, string symbology, string scannerID)
         {
             Scanner scanner = GetScannerById(scannerID);
-            ScanEventInfo = new DataScan(barcode, symbology, ScannerAction, scanner);
+            ScanEventInfo = new DataScan(barcode, symbology, scanner); //ScanEventInfo = new DataScan(barcode, symbology, scanner, ScannerAction);
             Log.Write(ScanEventInfo.ToString(), this);
             if (scanner.ScannerException == Alm.Ok)
             {
@@ -235,6 +234,7 @@ namespace ScannerService
                 ScanListenerEx?.Invoke((int)Status.Success, $"In scanner Id-{scanner.ScannerID}, SN-{scanner.Serialnumber} active alarm. Try reset it.");
             }
         }
+        
         private void Exception(Scanner scanner)
         {
             SetAlarmAttributeOnScanner(scanner);

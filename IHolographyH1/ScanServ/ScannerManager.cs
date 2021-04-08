@@ -37,7 +37,7 @@ namespace IHolographyH1
         {
             try
             {
-                ScanProductOrBoxProperties = ScannerAction.Undefined;
+                //ScanProductOrBoxProperties = ScannerAction.Undefined;
                 SubscribeCheckCreatedScannerListerEvent();
                 COM.OpenConnection();
                 if (scanListener == null)
@@ -100,8 +100,8 @@ namespace IHolographyH1
         }
         public void SetScanProductOrBoxProperties(ScannerAction scanAction)
         {
-            ScanProductOrBoxProperties = scanAction;
-            ScanListener.ScannerAction = (int)ScanProductOrBoxProperties;
+            //ScanProductOrBoxProperties = scanAction;
+            //ScanListener.ScannerAction = (int)ScanProductOrBoxProperties;
         }
         public void SetScannerMode(AppDefs.Mode mode)
         {

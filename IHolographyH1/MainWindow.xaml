@@ -8,14 +8,21 @@
         Title="MainWindow" Height="450" Width="800"
         WindowState="Maximized">
     <Grid>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="37" Margin="81,82,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="55"/>
         <DataGrid x:Name="dataGrid" HorizontalAlignment="Left" Height="316" Margin="229,70,0,0" VerticalAlignment="Top" Width="457"/>
-        <Button x:Name="button" Content="ResAlm" HorizontalAlignment="Left" Height="95" Margin="50,124,0,0" VerticalAlignment="Top" Width="124" Click="button_Click"/>
         <Button x:Name="button1" Content="Start" HorizontalAlignment="Left" Margin="81,295,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click"/>
-        <Button x:Name="button2" Content="ListRead" HorizontalAlignment="Left" Margin="81,28,0,0" VerticalAlignment="Top" Width="75" Click="button2_Click"/>
-        <Button x:Name="button3" Content="DataGrid" HorizontalAlignment="Left" Margin="50,245,0,0" VerticalAlignment="Top" Width="75" Click="button3_Click"/>
         <Button x:Name="button4" Content="Stop" HorizontalAlignment="Left" Margin="81,320,0,0" VerticalAlignment="Top" Width="75" Click="button4_Click"/>
         <Button x:Name="button5" Content="WeighGet" HorizontalAlignment="Left" Height="29" Margin="81,357,0,0" VerticalAlignment="Top" Width="75" Click="button5_Click"/>
+        <ComboBox x:Name="cb_Mode" HorizontalAlignment="Left" Margin="43,70,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="cb_Mode_SelectionChanged">
+            <ComboBoxItem Content="Test"/>
+            <ComboBoxItem Content="Work"/>
+        </ComboBox>
+        <Label x:Name="label" Content="Mode" HorizontalAlignment="Left" Margin="43,46,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label1" Content="Action" HorizontalAlignment="Left" Margin="43,118,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cb_Action" HorizontalAlignment="Left" Margin="43,141,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="2" SelectionChanged="cb_Action_SelectionChanged">
+            <ComboBoxItem Content="Product"/>
+            <ComboBoxItem Content="Box"/>
+            <ComboBoxItem Content="Undefined"/>
+        </ComboBox>
 
     </Grid>
 </Window>

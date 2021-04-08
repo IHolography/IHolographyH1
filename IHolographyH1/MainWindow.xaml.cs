@@ -45,6 +45,8 @@ namespace IHolographyH1
 
             weigher = new Weigher("COM2", 9600, Parity.None, StopBits.Two, 8, 5, AppDefs.Constant.LogEnable, AppDefs.Variable.DateTimeFormat, AppDefs.Constant.LogFilePath);
             weigher.WeighFinish += ShowMess;
+
+            
         }
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -57,19 +59,19 @@ namespace IHolographyH1
             try
             {
                 scanListen = new ScannerManager();
+                
+                scanListen.SetScanProductOrBoxProperties(AppDefs.ScannerAction.ProductScan) ;
                 scanListen.StartScannListener();
             }
             catch 
             {
                 Log.Write("Application failed");
-                Application.Current.Shutdown();
             }
         }
         private void CloseApp(string mess)
         {
             Log.Write(mess);
             MessageBox.Show("SSSs");
-            //Application.Current.Shutdown();
         }
         private void button2_Click(object sender, RoutedEventArgs e)
         {
@@ -101,6 +103,35 @@ namespace IHolographyH1
         {
             MessageBox.Show(val.ToString());
 
+        }
+
+
+        private void cb_Mode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+           if (cb_Mode.SelectionBoxItem.ToString()== "Test")
+            {
+                scanListen?.SetScannerMode(AppDefs.Mode.Test);
+            }
+           else
+            {
+                scanListen?.SetScannerMode(AppDefs.Mode.Work);
+            }
+        }
+
+        private void cb_Action_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cb_Mode.SelectionBoxItem.ToString() == "Box")
+            {
+                scanListen?.SetScanProductOrBoxProperties(AppDefs.ScannerAction.BoxScan);
+            }
+            if (cb_Mode.SelectionBoxItem.ToString() == "Product")
+            {
+                scanListen?.SetScanProductOrBoxProperties(AppDefs.ScannerAction.ProductScan);
+            }
+            if (cb_Mode.SelectionBoxItem.ToString() == "Undefined")
+            {
+                scanListen?.SetScanProductOrBoxProperties(AppDefs.ScannerAction.Undefined);
+            }
         }
     }
 }
