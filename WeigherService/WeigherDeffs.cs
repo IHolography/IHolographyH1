@@ -4,16 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WeigherService
+namespace iHolography
 {
-    public enum Status
+    namespace WeigherService
     {
-        Success = 0,
-        Locked = 10,
-        Failed = -1
-    }
-    public class WeigherDeffs
-    {
-        
+        public enum Status
+        {
+            Success = 0,
+            Locked = 10,
+            Failed = -1
+        }
+        public class WeigherDeffs
+        {
+
+        }
     }
 }

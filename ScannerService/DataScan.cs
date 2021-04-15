@@ -1,6 +1,8 @@
 ﻿
-namespace ScannerService
+namespace iHolography
 {
+    namespace ScannerService
+    {
         public class DataScan
         {
             public string Barcode { get; private set; }
@@ -20,9 +22,10 @@ namespace ScannerService
             }
             public override string ToString()
             {
-            return $"Data scan: action - {ScannerAction}, barcode - {Barcode}"+
-                   $", ScannerID - {Scanner.ScannerID}, ScannerSN - {Scanner.Serialnumber}, Symbology - {Symbology}, Date - {CreateDateTime}";
+                return $"Data scan: action - {ScannerAction}, barcode - {Barcode}" +
+                       $", ScannerID - {Scanner.ScannerID}, ScannerSN - {Scanner.Serialnumber}, Symbology - {Symbology}, Date - {CreateDateTime}";
             }
 
         }
+    }
 }

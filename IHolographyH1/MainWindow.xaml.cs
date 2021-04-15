@@ -16,9 +16,9 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.IO;
 using AppDefs;
-using Logger;
-using ScannerService;
-using WeigherService;
+using iHolography.Logger;
+using iHolography.ScannerService;
+using iHolography.WeigherService;
 using System.IO.Ports;
 
 namespace IHolographyH1

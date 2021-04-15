@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using AppDefs;
-using Logger;
-using ScannerService;
+using iHolography.Logger;
+using iHolography.ScannerService;
 
 namespace IHolographyH1
 {

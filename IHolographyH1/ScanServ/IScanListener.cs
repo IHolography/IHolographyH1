@@ -1,5 +1,5 @@
 ﻿using AppDefs;
-using ScannerService;
+using iHolography.ScannerService;
 
 namespace IHolographyH1
 {

@@ -1,72 +1,75 @@
 ﻿using System;
 using System.IO;
-using Logger.Deffs;
+using iHolography.Logger.Deffs;
 
-namespace Logger
+namespace iHolography
 {
-    public static class Log
+    namespace Logger
     {
-        public static int LogStatus { get; set; }
-        public static string LogFilePath { get; set; }
-        public static bool LogEnable { get; set; }
-        public static string DateTimeFormat { get; set; }
-
-        static Log()
+        public static class Log
         {
-            LogStatus = (int)Status.Failed;
+            public static int LogStatus { get; set; }
+            public static string LogFilePath { get; set; }
+            public static bool LogEnable { get; set; }
+            public static string DateTimeFormat { get; set; }
 
-            LogFilePath = @"C:\Users\Public\Documents\";
-            LogEnable = true;
-            DateTimeFormat = "G";
-
-        }
-        
-        private static async void WriteDoc(string message)
-        {
-            try
+            static Log()
             {
-                if (LogEnable)
+                LogStatus = (int)Status.Failed;
+
+                LogFilePath = @"C:\Users\Public\Documents\";
+                LogEnable = true;
+                DateTimeFormat = "G";
+
+            }
+
+            private static async void WriteDoc(string message)
+            {
+                try
                 {
-                    string filePath = LogFilePath + "//LogFile_App.txt";
-                    try
+                    if (LogEnable)
                     {
-                        if (!File.Exists(filePath))
+                        string filePath = LogFilePath + "//LogFile_App.txt";
+                        try
                         {
-                            using (StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.Default))
+                            if (!File.Exists(filePath))
                             {
-                                await sw.WriteLineAsync(message);
-                                LogStatus = (int)Status.Success;
+                                using (StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.Default))
+                                {
+                                    await sw.WriteLineAsync(message);
+                                    LogStatus = (int)Status.Success;
+                                }
+                            }
+                            else
+                            {
+                                using (StreamWriter sw = new StreamWriter(filePath, true, System.Text.Encoding.Default))
+                                {
+                                    await sw.WriteLineAsync(message);
+                                    LogStatus = (int)Status.Success;
+                                }
                             }
                         }
-                        else
+                        catch
                         {
-                            using (StreamWriter sw = new StreamWriter(filePath, true, System.Text.Encoding.Default))
-                            {
-                                await sw.WriteLineAsync(message);
-                                LogStatus = (int)Status.Success;
-                            }
+                            throw new Exception("Logger cann't write file.");
                         }
-                    }
-                    catch
-                    {
-                        throw new Exception("Logger cann't write file.");
                     }
                 }
+                catch
+                {
+                    throw new NullReferenceException();
+                }
             }
-            catch
-            {
-                throw new NullReferenceException();
-            }
-        }
-      
-        public static void Write(string message)
-        {
-            WriteDoc($"date: {Variable.GetStringDateTime(DateTimeFormat)} ; message: {message}");
-        }
-        public static void Write(string message, object sender)
-        {
-            WriteDoc($"date: {Variable.GetStringDateTime(DateTimeFormat)} ; sender:{sender}; message: {message}");
-        }
 
+            public static void Write(string message)
+            {
+                WriteDoc($"date: {Variable.GetStringDateTime(DateTimeFormat)} ; message: {message}");
+            }
+            public static void Write(string message, object sender)
+            {
+                WriteDoc($"date: {Variable.GetStringDateTime(DateTimeFormat)} ; sender:{sender}; message: {message}");
+            }
+
+        }
     }
 }
