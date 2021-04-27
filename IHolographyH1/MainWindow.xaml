@@ -23,6 +23,7 @@
             <ComboBoxItem Content="Box"/>
             <ComboBoxItem Content="Undefined"/>
         </ComboBox>
+        <Button x:Name="btn_Discovery" Content="Discovery" HorizontalAlignment="Left" Height="24" Margin="691,127,0,0" VerticalAlignment="Top" Width="85" Click="btn_Discovery_Click"/>
 
     </Grid>
 </Window>

@@ -10,7 +10,7 @@ namespace iHolography
 {
     namespace WeigherService
     {
-        internal static class COM
+        public static class COM
         {
 
             #region LoggerProperties

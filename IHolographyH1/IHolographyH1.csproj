@@ -40,6 +40,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cognex.DataMan.SDK.Discovery.PC, Version=5.6.3.122, Culture=neutral, PublicKeyToken=9f98866f2a3a2e78" />
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -138,6 +139,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CognexCamListener\CognexCamListener.csproj">
+      <Project>{66e7152f-25f8-41e7-89b2-8bfa121da423}</Project>
+      <Name>CognexCamListener</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logger\Logger.csproj">
       <Project>{baf3c128-bec5-4327-b739-cca31d3e073b}</Project>
       <Name>Logger</Name>
