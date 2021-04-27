@@ -15,8 +15,12 @@ namespace iHolography
     {
         public class Connector
         {
-			public delegate void Rerult(string mess);
-			public event Rerult Ev;
+			public delegate void Barcode(string mess);
+			public delegate void Connection(string mess);
+
+			public event Barcode BarcodeDetect;
+			public event Connection ConnectionSeccuess;
+			public event Connection ConnectionDisconnected;
 
 			private ResultCollector _results;
 			private ISystemConnector _connector = null;
@@ -74,8 +78,8 @@ namespace iHolography
 
 
                     #region  Subscribe to events that are signalled when the system is connected / disconnected.
-                    //_system.SystemConnected += new SystemConnectedHandler(OnSystemConnected);
-                    //_system.SystemDisconnected += new SystemDisconnectedHandler(OnSystemDisconnected);
+                    _system.SystemConnected += new SystemConnectedHandler(OnSystemConnected);
+                    _system.SystemDisconnected += new SystemDisconnectedHandler(OnSystemDisconnected);
                     //_system.SystemWentOnline += new SystemWentOnlineHandler(OnSystemWentOnline);
                     //_system.SystemWentOffline += new SystemWentOfflineHandler(OnSystemWentOffline);
                     //_system.KeepAliveResponseMissed += new KeepAliveResponseMissedHandler(OnKeepAliveResponseMissed);
@@ -103,7 +107,7 @@ namespace iHolography
 					catch
 					{ }
 				}
-				catch (Exception ex)
+				catch
 				{
 					CleanupConnection();
 				}
@@ -112,8 +116,8 @@ namespace iHolography
 			{
 				if (null != _system)
 				{
-					//_system.SystemConnected -= OnSystemConnected;
-					//_system.SystemDisconnected -= OnSystemDisconnected;
+					_system.SystemConnected -= OnSystemConnected;
+					_system.SystemDisconnected -= OnSystemDisconnected;
 					//_system.SystemWentOnline -= OnSystemWentOnline;
 					//_system.SystemWentOffline -= OnSystemWentOffline;
 					//_system.KeepAliveResponseMissed -= OnKeepAliveResponseMissed;
@@ -136,7 +140,7 @@ namespace iHolography
 						case ResultTypes.ReadXml:
 							read_result = GetReadStringFromResultXml(simple_result.GetDataAsString());
 							result_id = simple_result.Id.Id;
-							Ev?.Invoke(read_result);
+							BarcodeDetect?.Invoke(read_result);
 							break;
 					}
 				}
@@ -175,6 +179,30 @@ namespace iHolography
 				}
 
 				return "";
+			}
+			public void Disconnect()
+			{
+				try
+				{
+					if (_system == null || _system.State != ConnectionState.Connected)
+						return;
+
+					_system.Disconnect();
+
+					CleanupConnection();
+
+					_results.ClearCachedResults();
+					_results = null;
+				}
+				catch { }
+			}
+			private void OnSystemConnected(object sender, EventArgs args)
+			{
+						ConnectionSeccuess?.Invoke("System connected");
+			}
+			private void OnSystemDisconnected(object sender, EventArgs args)
+			{
+						ConnectionDisconnected?.Invoke("System disconnected");
 			}
 		}
     }

@@ -136,8 +136,6 @@ namespace IHolographyH1
             }
         }
 
-        List<EthSystemDiscoverer.SystemInfo> cams = new List<EthSystemDiscoverer.SystemInfo>();
-        Connector con;
 
         private void btn_Discovery_Click(object sender, RoutedEventArgs e)
         {
@@ -146,7 +144,7 @@ namespace IHolographyH1
             //discovery.Discover();
             Connector connector = new Connector("admin","","192.168.100.71");
             MessageBox.Show(connector.Status.ToString());
-            connector.Ev += GetInfo;
+            connector.BarcodeDetect += GetInfo;
             connector.Connect();
         }
         //private void GetCam(EthSystemDiscoverer.SystemInfo camInfo)
