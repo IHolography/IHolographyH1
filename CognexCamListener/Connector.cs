@@ -29,7 +29,7 @@ namespace iHolography
 			private string _user="admin";
 			private string _path = @"C:\Users\Public\Pictures";
 			private string _password = "";
-			public System.Net.IPAddress _iPAddress = default;
+			private System.Net.IPAddress _iPAddress = default;
 
 			public string User
             {
