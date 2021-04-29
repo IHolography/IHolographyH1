@@ -24,6 +24,7 @@
             <ComboBoxItem Content="Undefined"/>
         </ComboBox>
         <Button x:Name="btn_Discovery" Content="Discovery" HorizontalAlignment="Left" Height="24" Margin="691,127,0,0" VerticalAlignment="Top" Width="85" Click="btn_Discovery_Click"/>
+        <Button x:Name="btn_disconnect" Content="Disconnect" HorizontalAlignment="Left" Height="22" Margin="691,163,0,0" VerticalAlignment="Top" Width="85" Click="btn_disconnect_Click"/>
 
     </Grid>
 </Window>

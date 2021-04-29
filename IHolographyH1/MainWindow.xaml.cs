@@ -21,7 +21,7 @@ using iHolography.ScannerService;
 using iHolography.WeigherService;
 using iHolography.CognexCamListener;
 using System.IO.Ports;
-using Cognex.DataMan.SDK.Discovery;
+using System.Drawing;
 
 namespace IHolographyH1
 {
@@ -136,20 +136,27 @@ namespace IHolographyH1
             }
         }
 
-
+        Connector connector;
         private void btn_Discovery_Click(object sender, RoutedEventArgs e)
         {
             //Discovery discovery = new Discovery();
             //discovery.CamDiscovered += GetInfo;
             //discovery.Discover();
-            Connector connector = new Connector("admin","","192.168.100.71");
+            connector = new Connector("admin","","192.168.100.71", @"C:\Users\Public\Pictures\12", new System.Drawing.Size(350,350),2);
             MessageBox.Show(connector.Status.ToString());
-            connector.BarcodeDetect += GetInfo;
+            connector.BarcodeDetectOK += GetInfo;
+            connector.ConnectionDisconnected += GetInfo;
+            connector.PictureSaved += GetInfo;
             connector.Connect();
         }
         public void GetInfo(string info)
         {
             MessageBox.Show(info);
+        }
+
+        private void btn_disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            connector.Disconnect();
         }
     }
 }
