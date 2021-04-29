@@ -1,14 +1,6 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cognex.DataMan.SDK.Discovery;
-using Cognex.DataMan.SDK;
-using System.Threading;
-using System.Collections.ObjectModel;
-using System.Windows;
-
 namespace iHolography
 {
     namespace CognexCamListener
@@ -30,7 +22,6 @@ namespace iHolography
             public void Discovery()
             {
                 _ethSystemDiscoverer.Discover();
-                //new Connector(ListOfDiscoveredCam[0]);
             }
             private void OnEthSystemDiscovered(EthSystemDiscoverer.SystemInfo systemInfo)
             {

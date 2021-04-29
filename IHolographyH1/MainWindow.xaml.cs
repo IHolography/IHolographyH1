@@ -147,15 +147,6 @@ namespace IHolographyH1
             connector.BarcodeDetect += GetInfo;
             connector.Connect();
         }
-        //private void GetCam(EthSystemDiscoverer.SystemInfo camInfo)
-        //{
-        //    cams.Add(camInfo);
-        //    if (cams.Count == 2)
-        //    {
-        //        con = new Connector(cams[0]);
-        //    }
-
-        //}
         public void GetInfo(string info)
         {
             MessageBox.Show(info);
