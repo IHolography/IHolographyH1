@@ -142,7 +142,7 @@ namespace IHolographyH1
             //Discovery discovery = new Discovery();
             //discovery.CamDiscovered += GetInfo;
             //discovery.Discover();
-            connector = new Connector("admin","","192.168.100.71", @"C:\Users\Public\Pictures\12", new System.Drawing.Size(350,350),2);
+            connector = new Connector("admin","","192.168.100.71", @"C:\Users\Public\Pictures\12\", new System.Drawing.Size(350,350),2);
             MessageBox.Show(connector.Status.ToString());
             connector.BarcodeDetectOK += GetInfo;
             connector.ConnectionDisconnected += GetInfo;

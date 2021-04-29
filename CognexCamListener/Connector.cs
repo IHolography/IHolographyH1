@@ -29,7 +29,6 @@ namespace iHolography
 			private string _user="admin";
 			private string _path = @"C:\Users\Public\Pictures";
 			private string _password = "";
-			private System.Net.IPAddress _iPAddress = default;
 
 			public string User
             {
@@ -62,7 +61,9 @@ namespace iHolography
 				set
 				{
 					string dir = value;
-						if (!Directory.Exists(dir))
+					if (dir[dir.Length - 1] == '\\') dir += DateTime.Now.ToString("yyyy-MM-dd");
+					else dir += "\\"+DateTime.Now.ToString("yyyy-MM-dd");
+					if (!Directory.Exists(dir))
 						{
 							try
 							{
@@ -70,7 +71,7 @@ namespace iHolography
 							}
 							catch
 							{
-								dir = @"C:\Users\Public\Pictures";
+								dir = @"C:\Users\Public\Pictures\iHolography\" + DateTime.Now.ToString("yyyy-MM-dd");
 							}
 						}
 					_path = dir;
@@ -89,7 +90,6 @@ namespace iHolography
 				Path = picturePath;
 				PictureSize = pictureSize;
 				PctByScan = pctByScan;
-
 			}
             public void Connect()
             {
