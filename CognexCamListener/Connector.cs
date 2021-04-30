@@ -29,6 +29,7 @@ namespace iHolography
 			private string _user="admin";
 			private string _path = @"C:\Users\Public\Pictures";
 			private string _password = "";
+			private bool _allTimeTransferImage = false;
 
 			public string User
             {
@@ -77,6 +78,17 @@ namespace iHolography
 					_path = dir;
 				}
 			}
+			public bool AllTimeTransferImage
+            {
+                get
+                {
+					return _allTimeTransferImage;
+                }
+                set
+                {
+					_allTimeTransferImage = value;
+                }
+            }
 			public Status Status { get; private set; }
 			public Size PictureSize { get; private set; }
 			public int PctByScan { get; set; }
@@ -196,8 +208,10 @@ namespace iHolography
 
 				//BarcodeDetect?.Invoke(read_result.Split('\n').Length.ToString());
 				barcodeCount = Regex.Matches(read_result, "$", RegexOptions.Multiline).Count;
+				//TransferImage flag
+				bool transferImageFlag = _allTimeTransferImage || (PctByScan != barcodeCount);
 
-				if (images.Count > 0 && PctByScan!=barcodeCount)
+				if (images.Count > 0 && transferImageFlag)
 				{
 					Image first_image = images[0];
 					Size image_size = Gui.FitImageInControl(first_image.Size, PictureSize);
