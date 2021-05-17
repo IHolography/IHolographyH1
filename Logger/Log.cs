@@ -20,7 +20,6 @@ namespace iHolography
                 LogFilePath = @"C:\Users\Public\Documents\";
                 LogEnable = true;
                 DateTimeFormat = "G";
-
             }
 
             private static async void WriteDoc(string message)
@@ -69,7 +68,6 @@ namespace iHolography
             {
                 WriteDoc($"date: {Variable.GetStringDateTime(DateTimeFormat)} ; sender:{sender}; message: {message}");
             }
-
         }
     }
 }

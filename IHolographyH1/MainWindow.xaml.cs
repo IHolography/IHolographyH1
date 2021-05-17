@@ -1,27 +1,12 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Threading;
-using System.IO;
-using AppDefs;
 using iHolography.Logger;
 using iHolography.ScannerService;
 using iHolography.WeigherService;
 using iHolography.CognexCamListener;
 using System.IO.Ports;
-using System.Drawing;
 
 namespace IHolographyH1
 {
@@ -107,7 +92,6 @@ namespace IHolographyH1
 
         }
 
-
         private void cb_Mode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
            if (cb_Mode.SelectionBoxItem.ToString()== "Test")
@@ -147,7 +131,7 @@ namespace IHolographyH1
             MessageBox.Show(connector.Status.ToString());
             connector.BarcodeDetectOK += GetInfo;
             connector.ConnectionDisconnected += GetInfo;
-            connector.PictureSaved += GetInfo;
+           // connector.PictureSaved += GetInfo;
             connector.Connect();
         }
         public void GetInfo(string info)
@@ -158,6 +142,11 @@ namespace IHolographyH1
         private void btn_disconnect_Click(object sender, RoutedEventArgs e)
         {
             connector.Disconnect();
+        }
+
+        private void button_Click_1(object sender, RoutedEventArgs e)
+        {
+            connector.Trigger();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace iHolography
 {
@@ -15,10 +16,11 @@ namespace iHolography
         {
 			public delegate void Barcode(string mess);
 			public delegate void Connection(string mess);
+			public delegate void Photo(Image img, string path);
 
 			public event Barcode BarcodeDetectOK;
 			public event Barcode BarcodeDetectFailed;
-			public event Barcode PictureSaved;
+			public event Photo PictureSaved;
 			public event Connection ConnectionSeccuess;
 			public event Connection ConnectionDisconnected;
 
@@ -29,7 +31,7 @@ namespace iHolography
 			private string _user="admin";
 			private string _path = @"C:\Users\Public\Pictures";
 			private string _password = "";
-			private bool _allTimeTransferImage = false;
+			private bool _allTimeTransferImage = true;
 
 			public string User
             {
@@ -102,6 +104,16 @@ namespace iHolography
 				Path = picturePath;
 				PictureSize = pictureSize;
 				PctByScan = pctByScan;
+			}
+			public void Trigger()
+			{
+				try
+				{
+					_system.SendCommand("TRIGGER ON");
+					Thread.Sleep(50);
+					_system.SendCommand("TRIGGER OFF");
+				}
+				catch { }
 			}
             public void Connect()
             {
@@ -228,8 +240,9 @@ namespace iHolography
 							}
 						}
 					}
-					fitted_image.Save(_path+"//"+ DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".jpg");
-					PictureSaved?.Invoke("Picture Saved");
+					string myPath = _path + "\\" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".jpg";
+					fitted_image.Save(myPath);
+					PictureSaved?.Invoke(fitted_image, myPath);
 				}
 
 				if (PctByScan != barcodeCount) BarcodeDetectFailed?.Invoke(read_result);
