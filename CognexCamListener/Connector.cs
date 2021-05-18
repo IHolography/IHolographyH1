@@ -222,8 +222,7 @@ namespace iHolography
 				barcodeCount = Regex.Matches(read_result, "$", RegexOptions.Multiline).Count;
 				//TransferImage flag
 				bool transferImageFlag = _allTimeTransferImage || (PctByScan != barcodeCount);
-
-				if (images.Count > 0 && transferImageFlag)
+				if (images.Count > 0)
 				{
 					Image first_image = images[0];
 					Size image_size = Gui.FitImageInControl(first_image.Size, PictureSize);
@@ -241,12 +240,18 @@ namespace iHolography
 						}
 					}
 					string myPath = _path + "\\" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".jpg";
-					fitted_image.Save(myPath);
+					if (transferImageFlag)
+					{
+						fitted_image.Save(myPath);
+					}
 					PictureSaved?.Invoke(fitted_image, myPath);
 				}
 
 				if (PctByScan != barcodeCount) BarcodeDetectFailed?.Invoke(read_result);
-				else BarcodeDetectOK?.Invoke(read_result);
+				else
+				{
+					BarcodeDetectOK?.Invoke(read_result);
+				}
 			}
 			private string GetReadStringFromResultXml(string resultXml)
 			{

@@ -130,13 +130,18 @@ namespace IHolographyH1
             connector.AllTimeTransferImage = true;
             MessageBox.Show(connector.Status.ToString());
             connector.BarcodeDetectOK += GetInfo;
+            connector.BarcodeDetectFailed += GetInfo1;
             connector.ConnectionDisconnected += GetInfo;
            // connector.PictureSaved += GetInfo;
             connector.Connect();
         }
         public void GetInfo(string info)
         {
-            MessageBox.Show(info);
+            MessageBox.Show("ok"+info);
+        }
+        public void GetInfo1(string info)
+        {
+            MessageBox.Show("not ok: "+info);
         }
 
         private void btn_disconnect_Click(object sender, RoutedEventArgs e)
