@@ -32,16 +32,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cognex.DataMan.CogNamer.PC">
-      <HintPath>C:\Users\krasovskiy\Cognex\DataMan SDK 5.6.3\Binaries\PC\Cognex.DataMan.CogNamer.PC.dll</HintPath>
+      <HintPath>..\..\..\CognexSdk\Binaries\PC\Cognex.DataMan.CogNamer.PC.dll</HintPath>
     </Reference>
     <Reference Include="Cognex.DataMan.SDK.Discovery.PC">
-      <HintPath>C:\Users\krasovskiy\Cognex\DataMan SDK 5.6.3\Binaries\PC\Cognex.DataMan.SDK.Discovery.PC.dll</HintPath>
+      <HintPath>..\..\..\CognexSdk\Binaries\PC\Cognex.DataMan.SDK.Discovery.PC.dll</HintPath>
     </Reference>
     <Reference Include="Cognex.DataMan.SDK.PC">
-      <HintPath>C:\Users\krasovskiy\Cognex\DataMan SDK 5.6.3\Binaries\PC\Cognex.DataMan.SDK.PC.dll</HintPath>
+      <HintPath>..\..\..\CognexSdk\Binaries\PC\Cognex.DataMan.SDK.PC.dll</HintPath>
     </Reference>
     <Reference Include="Cognex.DataMan.SDK.Utils.PC">
-      <HintPath>C:\Users\krasovskiy\Cognex\DataMan SDK 5.6.3\Binaries\PC\Cognex.DataMan.SDK.Utils.PC.dll</HintPath>
+      <HintPath>..\..\..\CognexSdk\Binaries\PC\Cognex.DataMan.SDK.Utils.PC.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

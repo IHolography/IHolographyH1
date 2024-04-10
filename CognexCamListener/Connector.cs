@@ -144,10 +144,9 @@ namespace iHolography
 
                     #region Subscribe to events that are signalled when the device sends auto-responses.
                     ResultTypes requested_result_types = ResultTypes.ReadXml | ResultTypes.Image | ResultTypes.ImageGraphics;
-                    //ResultTypes requested_result_types = ResultTypes.ReadXml;
 					_results = new ResultCollector(_system, requested_result_types);
 					_results.ComplexResultCompleted += Results_ComplexResultCompleted;
-                    //_results.SimpleResultDropped += Results_SimpleResultDropped;
+                    _results.SimpleResultDropped += Results_SimpleResultDropped;
                     #endregion
                     
 					//_system.SetKeepAliveOptions(cbEnableKeepAlive.Checked, 3000, 1000);
@@ -183,7 +182,12 @@ namespace iHolography
 				_connector = null;
 				_system = null;
 			}
-			private void Results_ComplexResultCompleted(object sender, ComplexResult e)
+            private void Results_SimpleResultDropped(object sender, SimpleResult e)
+            {
+                BarcodeDetectOK?.Invoke(e.ToString());
+            }
+
+            private void Results_ComplexResultCompleted(object sender, ComplexResult e)
 			{
 				List<Image> images = new List<Image>();
 				List<string> image_graphics = new List<string>();
