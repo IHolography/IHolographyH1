@@ -179,83 +179,105 @@ namespace iHolography
 					//_system.AutomaticResponseArrived -= AutomaticResponseArrived;
 				}
 
-				_connector = null;
-				_system = null;
+				//_connector = null;
+				//_system = null;
 			}
             private void Results_SimpleResultDropped(object sender, SimpleResult e)
             {
-                BarcodeDetectOK?.Invoke(e.ToString());
+				try
+				{
+					string read_result = null;
+					switch (e.Id.Type)
+					{
+						case ResultTypes.ReadXml:
+							read_result = GetReadStringFromResultXml(e.GetDataAsString());
+							BarcodeDetectOK?.Invoke(read_result.ToString());
+							break;
+
+						case ResultTypes.ReadString:
+							read_result = e.GetDataAsString();
+							BarcodeDetectOK?.Invoke(read_result.ToString());
+							break;
+						default:
+							BarcodeDetectOK?.Invoke(e.ToString());
+							break;
+					}
+				}
+				catch { }
             }
 
             private void Results_ComplexResultCompleted(object sender, ComplexResult e)
 			{
-				List<Image> images = new List<Image>();
-				List<string> image_graphics = new List<string>();
-				string read_result = null;
-				int result_id = -1;
-				int barcodeCount = 0;
-				ResultTypes collected_results = ResultTypes.None;
-				foreach (var simple_result in e.SimpleResults)
+				try
 				{
-					collected_results |= simple_result.Id.Type;
-					switch (simple_result.Id.Type)
+                    List<Image> images = new List<Image>();
+                    List<string> image_graphics = new List<string>();
+                    string read_result = null;
+                    int result_id = -1;
+                    int barcodeCount = 0;
+                    ResultTypes collected_results = ResultTypes.None;
+                    foreach (var simple_result in e.SimpleResults)
+                    {
+                        collected_results |= simple_result.Id.Type;
+                        switch (simple_result.Id.Type)
+                        {
+                            case ResultTypes.Image:
+                                Image image = ImageArrivedEventArgs.GetImageFromImageBytes(simple_result.Data);
+                                if (image != null)
+                                    images.Add(image);
+                                break;
+
+                            case ResultTypes.ImageGraphics:
+                                image_graphics.Add(simple_result.GetDataAsString());
+                                break;
+
+                            case ResultTypes.ReadXml:
+                                read_result = GetReadStringFromResultXml(simple_result.GetDataAsString());
+                                result_id = simple_result.Id.Id;
+                                break;
+
+                            case ResultTypes.ReadString:
+                                read_result = simple_result.GetDataAsString();
+                                result_id = simple_result.Id.Id;
+                                break;
+                        }
+                    }
+                    //BarcodeDetect?.Invoke(read_result.Split('\n').Length.ToString());
+                    barcodeCount = Regex.Matches(read_result, "$", RegexOptions.Multiline).Count;
+					//TransferImage flag
+					bool transferImageFlag = _allTimeTransferImage || (PctByScan != barcodeCount);
+					if (images.Count > 0)
 					{
-						case ResultTypes.Image:
-							Image image = ImageArrivedEventArgs.GetImageFromImageBytes(simple_result.Data);
-							if (image != null)
-							images.Add(image);
-							break;
+						Image first_image = images[0];
+						Size image_size = Gui.FitImageInControl(first_image.Size, PictureSize);
+						Image fitted_image = Gui.ResizeImageToBitmap(first_image, image_size);
 
-						case ResultTypes.ImageGraphics:
-							image_graphics.Add(simple_result.GetDataAsString());
-							break;
-
-						case ResultTypes.ReadXml:
-							read_result = GetReadStringFromResultXml(simple_result.GetDataAsString());
-							result_id = simple_result.Id.Id;
-							break;
-
-						case ResultTypes.ReadString:
-							read_result = simple_result.GetDataAsString();
-							result_id = simple_result.Id.Id;
-							break;
-					}
-				}
-
-				//BarcodeDetect?.Invoke(read_result.Split('\n').Length.ToString());
-				barcodeCount = Regex.Matches(read_result, "$", RegexOptions.Multiline).Count;
-				//TransferImage flag
-				bool transferImageFlag = _allTimeTransferImage || (PctByScan != barcodeCount);
-				if (images.Count > 0)
-				{
-					Image first_image = images[0];
-					Size image_size = Gui.FitImageInControl(first_image.Size, PictureSize);
-					Image fitted_image = Gui.ResizeImageToBitmap(first_image, image_size);
-
-					if (image_graphics.Count > 0)
-					{
-						using (Graphics g = Graphics.FromImage(fitted_image))
+						if (image_graphics.Count > 0)
 						{
-							foreach (var graphics in image_graphics)
+							using (Graphics g = Graphics.FromImage(fitted_image))
 							{
-								ResultGraphics rg = GraphicsResultParser.Parse(graphics, new Rectangle(0, 0, image_size.Width, image_size.Height));
-								ResultGraphicsRenderer.PaintResults(g, rg);
+								foreach (var graphics in image_graphics)
+								{
+									ResultGraphics rg = GraphicsResultParser.Parse(graphics, new Rectangle(0, 0, image_size.Width, image_size.Height));
+									ResultGraphicsRenderer.PaintResults(g, rg);
+								}
 							}
 						}
+						string myPath = _path + "\\" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".jpg";
+						if (transferImageFlag)
+						{
+							fitted_image.Save(myPath);
+						}
+						PictureSaved?.Invoke(fitted_image, myPath);
 					}
-					string myPath = _path + "\\" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".jpg";
-					if (transferImageFlag)
-					{
-						fitted_image.Save(myPath);
-					}
-					PictureSaved?.Invoke(fitted_image, myPath);
-				}
 
-				if (PctByScan != barcodeCount) BarcodeDetectFailed?.Invoke(read_result);
-				else
-				{
-					BarcodeDetectOK?.Invoke(read_result);
+					if (PctByScan != barcodeCount) BarcodeDetectFailed?.Invoke(read_result);
+					else
+					{
+						BarcodeDetectOK?.Invoke(read_result);
+					}
 				}
+				catch { }
 			}
 			private string GetReadStringFromResultXml(string resultXml)
 			{
@@ -310,11 +332,21 @@ namespace iHolography
 			}
 			private void OnSystemConnected(object sender, EventArgs args)
 			{
-						ConnectionSeccuess?.Invoke("System connected");
+				try
+				{
+					ConnectionSeccuess?.Invoke("System connected");
+				}
+				catch { }
+						
 			}
 			private void OnSystemDisconnected(object sender, EventArgs args)
 			{
-						ConnectionDisconnected?.Invoke("System disconnected");
+                try
+                {
+                    ConnectionDisconnected?.Invoke("System disconnected");
+                }
+                catch { }
+                
 			}
 		}
     }
